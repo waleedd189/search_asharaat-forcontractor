@@ -1,0 +1,978 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naolon — الداشبورد التراكمي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070d18;--bg2:#0d1829;--border:rgba(16,185,129,0.15);--green:#10b981;--gold:#f59e0b;--blue:#3b82f6;--red:#ef4444;--purple:#a855f7;--muted:#64748b}
+*{font-family:'Cairo',sans-serif;margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:#f1f5f9;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;z-index:-1;
+  background:radial-gradient(ellipse at 10% 10%,rgba(16,185,129,0.07) 0%,transparent 50%),
+             radial-gradient(ellipse at 90% 90%,rgba(59,130,246,0.05) 0%,transparent 50%),var(--bg)}
+.wrap{max-width:1400px;margin:0 auto;padding:20px}
+
+/* HEADER */
+.hdr{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 22px;margin-bottom:20px;
+  background:rgba(13,24,41,0.95);border:1px solid var(--border);border-radius:18px}
+.hdr-logo{width:46px;height:46px;flex-shrink:0;background:linear-gradient(135deg,#10b981,#059669);
+  border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.hdr-info h1{font-size:18px;font-weight:900;color:white}
+.hdr-info p{font-size:11px;color:var(--green);margin-top:2px}
+.hdr-right{margin-right:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.last-update{font-size:11px;color:var(--muted)}
+.save-btn{padding:8px 18px;border-radius:10px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#f59e0b,#d97706);color:white;font-size:12px;font-weight:800;
+  font-family:'Cairo',sans-serif;transition:all .2s;display:none}
+.save-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(245,158,11,0.3)}
+
+/* UPLOAD PANEL */
+.upload-panel{background:rgba(13,24,41,0.95);border:1px solid rgba(245,158,11,0.3);
+  border-radius:16px;padding:20px;margin-bottom:20px}
+.upload-title{font-size:14px;font-weight:800;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.drop-zone{border:2px dashed rgba(16,185,129,0.3);border-radius:12px;padding:30px;text-align:center;
+  cursor:pointer;transition:all .3s;background:rgba(16,185,129,0.03);position:relative}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--green);background:rgba(16,185,129,0.08)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon{font-size:36px;margin-bottom:8px}
+.drop-text{font-size:13px;color:var(--muted);font-weight:600}
+.drop-sub{font-size:11px;color:rgba(100,116,139,0.7);margin-top:4px}
+.files-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.file-chip{display:flex;align-items:center;gap:6px;background:rgba(16,185,129,0.1);
+  border:1px solid rgba(16,185,129,0.2);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--green)}
+.file-chip button{background:none;border:none;color:var(--red);cursor:pointer;font-size:12px;padding:0;line-height:1}
+.load-btn{padding:10px 24px;border-radius:10px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--green),#059669);color:white;font-size:13px;
+  font-weight:800;font-family:'Cairo',sans-serif;transition:all .2s;white-space:nowrap;margin-top:12px}
+.load-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(16,185,129,0.3)}
+.load-btn:disabled{opacity:.6;pointer-events:none}
+.hint{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6}
+
+/* FILTER */
+.filter{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 16px;
+  background:rgba(13,24,41,0.9);border:1px solid var(--border);border-radius:14px;margin-bottom:20px}
+.filter label{font-size:12px;color:var(--muted);font-weight:700}
+.fbtn{padding:6px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.04);color:var(--muted);font-size:12px;font-weight:700;
+  cursor:pointer;transition:all .2s;font-family:'Cairo',sans-serif}
+.fbtn:hover{border-color:var(--green);color:var(--green)}
+.fbtn.on{background:rgba(16,185,129,0.15);border-color:var(--green);color:var(--green)}
+.fbtn.latest::after{content:' ●';color:var(--green);font-size:8px;vertical-align:middle}
+.search-wrap{margin-right:auto}
+.search-wrap input{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;padding:7px 14px;color:white;font-size:13px;font-family:'Cairo',sans-serif;
+  width:200px;outline:none;transition:all .2s}
+.search-wrap input:focus{border-color:var(--green)}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}
+.scard{padding:18px;text-align:center;background:rgba(13,24,41,0.9);
+  border:1px solid var(--border);border-radius:16px;transition:transform .2s;position:relative;overflow:hidden}
+.scard:hover{transform:translateY(-3px)}
+.scard::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0}
+.scard.green::after{background:linear-gradient(90deg,#10b981,#059669)}
+.scard.blue::after{background:linear-gradient(90deg,#3b82f6,#2563eb)}
+.scard.gold::after{background:linear-gradient(90deg,#f59e0b,#d97706)}
+.scard.purple::after{background:linear-gradient(90deg,#a855f7,#9333ea)}
+.scard.red::after{background:linear-gradient(90deg,#ef4444,#dc2626)}
+.scard-icon{font-size:24px;margin-bottom:6px}
+.scard-val{font-size:20px;font-weight:900;margin-bottom:3px}
+.scard-val.green{color:var(--green)}.scard-val.blue{color:var(--blue)}
+.scard-val.gold{color:var(--gold)}.scard-val.purple{color:var(--purple)}.scard-val.red{color:var(--red)}
+.scard-lbl{font-size:11px;color:var(--muted);font-weight:600}
+
+/* CHARTS */
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.ccrd{background:rgba(13,24,41,0.9);border:1px solid var(--border);border-radius:16px;padding:18px}
+.ccrd.full{grid-column:1/-1}
+.ctitle{font-size:13px;font-weight:800;color:var(--gold);margin-bottom:14px}
+.cwrap{height:240px;position:relative}
+.cwrap.tall{height:280px}
+
+/* SECTION */
+.section{background:rgba(13,24,41,0.9);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:16px}
+.stitle{font-size:14px;font-weight:800;color:var(--gold);margin-bottom:14px;
+  padding-bottom:10px;border-bottom:1px solid var(--border)}
+
+/* PROJECT BARS */
+.prow{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.pname{font-size:12px;font-weight:700;color:white;width:180px;flex-shrink:0;text-align:right}
+.pbar-bg{flex:1;background:rgba(255,255,255,0.04);border-radius:6px;height:22px;overflow:hidden}
+.pbar{height:100%;border-radius:6px;display:flex;align-items:center;padding:0 8px;
+  font-size:11px;font-weight:700;color:white;transition:width .8s ease}
+.pamount{font-size:11px;color:var(--green);font-weight:700;width:110px;flex-shrink:0}
+
+/* TABS */
+.tabs{display:flex;gap:3px;background:rgba(255,255,255,0.03);border-radius:12px;
+  padding:3px;border:1px solid var(--border);margin-bottom:16px}
+.tabBtn{flex:1;padding:9px;text-align:center;border-radius:9px;cursor:pointer;
+  font-size:13px;font-weight:700;color:var(--muted);transition:all .2s;border:none;
+  background:none;font-family:'Cairo',sans-serif}
+.tabBtn.on{background:linear-gradient(135deg,var(--green),#059669);color:white;
+  box-shadow:0 4px 12px rgba(16,185,129,0.25)}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
+th{background:rgba(16,185,129,0.1);padding:9px 11px;text-align:right;font-weight:800;
+  color:#a7f3d0;white-space:nowrap;position:sticky;top:0;z-index:1}
+td{padding:8px 11px;border-bottom:1px solid rgba(255,255,255,0.04);white-space:nowrap}
+tr:hover td{background:rgba(16,185,129,0.04);cursor:pointer}
+.tn{color:white;font-weight:700}.tg{color:var(--green);font-weight:700}
+.tb{color:var(--blue);font-weight:700}.tgold{color:var(--gold);font-weight:800}
+.tm{color:var(--muted)}.tr{color:var(--red)}.tp{color:var(--purple);font-weight:700}
+.db{display:inline-block;padding:2px 7px;border-radius:6px;font-size:11px;font-weight:700}
+.dw{background:rgba(16,185,129,0.12);color:var(--green)}
+.do{background:rgba(59,130,246,0.12);color:var(--blue)}
+.ds{background:rgba(239,68,68,0.12);color:var(--red)}
+.dv{background:rgba(168,85,247,0.12);color:var(--purple)}
+.da{background:rgba(239,68,68,0.18);color:#fca5a5}
+.dwt{background:rgba(245,158,11,0.12);color:var(--gold)}
+
+/* SALARY DIST */
+.dist-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.dist-card{background:rgba(0,0,0,0.2);border-radius:12px;padding:14px}
+.dist-card-title{font-size:13px;font-weight:800;color:var(--green);margin-bottom:12px;text-align:center}
+.dist-row{display:flex;align-items:center;gap:8px;padding:5px 4px;border-radius:6px;
+  cursor:pointer;transition:background .15s}
+.dist-row:hover{background:rgba(16,185,129,0.08)}
+.dist-lbl{font-size:11px;font-weight:700;color:white;flex:1}
+.dist-cnt{font-size:13px;font-weight:800;min-width:30px;text-align:center}
+.dist-pct{font-size:11px;color:var(--muted);min-width:35px;text-align:center}
+.dist-bar-bg{width:80px;background:rgba(255,255,255,0.05);border-radius:4px;height:12px;overflow:hidden}
+.dist-bar{height:100%;border-radius:4px;transition:width .6s}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;
+  display:none;align-items:center;justify-content:center;padding:16px}
+.overlay.show{display:flex}
+.modal{background:#0d1829;border:1px solid var(--border);border-radius:20px;
+  width:100%;max-width:780px;max-height:88vh;overflow-y:auto}
+.mhdr{padding:18px 22px;border-bottom:1px solid var(--border);position:sticky;top:0;
+  background:#0d1829;z-index:1;display:flex;justify-content:space-between;align-items:center}
+.mclose{background:rgba(239,68,68,0.15);border:none;color:var(--red);border-radius:8px;
+  padding:7px 13px;cursor:pointer;font-size:17px;font-weight:900;font-family:'Cairo',sans-serif}
+.mtabs{padding:10px 22px;border-bottom:1px solid var(--border);background:rgba(0,0,0,0.2);
+  display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.mtab{padding:5px 13px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.04);color:var(--muted);font-size:11px;font-weight:700;
+  cursor:pointer;font-family:'Cairo',sans-serif;transition:all .2s}
+.mtab.on{background:rgba(16,185,129,0.15);border-color:var(--green);color:var(--green)}
+.mtab.cmp{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:var(--gold)}
+.mcmp{display:flex;align-items:center;gap:6px;margin-right:auto}
+.mcmp select{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  border-radius:8px;color:white;padding:4px 8px;font-size:11px;font-family:'Cairo',sans-serif;outline:none}
+.mbody{padding:20px 22px}
+.mini-grid{display:grid;gap:10px;margin-bottom:14px}
+.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.up{color:var(--green)}.dn{color:var(--red)}.eq{color:var(--muted)}
+
+/* LOADING */
+.loader{text-align:center;padding:80px 20px}
+.spinner{width:48px;height:48px;border:4px solid rgba(16,185,129,0.2);border-top-color:var(--green);
+  border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader p{color:var(--muted);font-size:14px}
+
+/* FOOTER */
+.footer{text-align:center;padding:20px;color:var(--muted);font-size:11px}
+.footer span{color:var(--gold);font-weight:800}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}}
+@media(max-width:600px){.wrap{padding:12px}.stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-logo">🚛</div>
+  <div class="hdr-info">
+    <h1>Naolon — الداشبورد التراكمي</h1>
+    <p id="hdrSub">اضبط إعدادات GitHub وابدأ</p>
+  </div>
+  <div class="hdr-right">
+    <span class="last-update" id="lastUpdate"></span>
+    <button class="save-btn" id="saveBtn" onclick="saveDashboard()">💾 حفظ الداشبورد</button>
+  </div>
+</div>
+
+<!-- UPLOAD PANEL -->
+<div class="upload-panel">
+  <div class="upload-title">📂 رفع ملفات Excel</div>
+  <div class="drop-zone" id="dropZone">
+    <input type="file" id="xlsxInput" accept=".xlsx,.xls" multiple onchange="handleFiles(this.files)">
+    <div class="drop-icon">📊</div>
+    <div class="drop-text">اسحب ملفات Excel هنا أو اضغط للاختيار</div>
+    <div class="drop-sub">يمكن رفع أكثر من ملف — كل ملف = شهر</div>
+  </div>
+  <div class="files-list" id="filesList"></div>
+  <button class="load-btn" id="loadBtn" onclick="processFiles()" disabled>🚀 تحليل البيانات</button>
+  <p id="loadingMsg" style="font-size:12px;color:var(--green);margin-top:8px"></p>
+  <div class="hint">كل ملف Excel يمثل شهر — اسم الملف هو اسم الشهر في التقرير.</div>
+</div>
+
+<!-- FILTER -->
+  <div class="filter">
+    <label>📅 الشهور:</label>
+    <div id="mFilters" style="display:flex;gap:5px;flex-wrap:wrap"></div>
+    <div class="search-wrap"><input id="searchQ" type="text" placeholder="🔍 ابحث عن سائق..."></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="scard green"><div class="scard-icon">💰</div><div class="scard-val green" id="sTotal">—</div><div class="scard-lbl">إجمالي المبلغ</div></div>
+    <div class="scard blue"><div class="scard-icon">🚛</div><div class="scard-val blue" id="sTrips">—</div><div class="scard-lbl">إجمالي النقلات</div></div>
+    <div class="scard gold"><div class="scard-icon">👤</div><div class="scard-val gold" id="sDrivers">—</div><div class="scard-lbl">السائقين</div></div>
+    <div class="scard purple"><div class="scard-icon">📦</div><div class="scard-val purple" id="sProjects">—</div><div class="scard-lbl">المشاريع</div></div>
+    <div class="scard red"><div class="scard-icon">📅</div><div class="scard-val red" id="sMonths">—</div><div class="scard-lbl">الشهور</div></div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="charts">
+    <div class="ccrd"><div class="ctitle">📈 المبلغ الشهري</div><div class="cwrap"><canvas id="chMonth"></canvas></div></div>
+    <div class="ccrd"><div class="ctitle">🥧 توزيع المشاريع</div><div class="cwrap"><canvas id="chProj"></canvas></div></div>
+    <div class="ccrd full"><div class="ctitle">👤 أعلى 15 سائق</div><div class="cwrap tall"><canvas id="chDrivers"></canvas></div></div>
+  </div>
+
+  <!-- PROJECTS -->
+  <div class="section"><div class="stitle">📦 المشاريع</div><div id="projBars"></div></div>
+
+  <!-- SALARY DIST -->
+  <div class="section">
+    <div class="stitle">💼 توزيع الرواتب</div>
+    <div class="dist-grid" id="salaryDist"></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tabBtn on" onclick="showTab('days',this)">📅 أيام السائقين</button>
+    <button class="tabBtn" onclick="showTab('trips',this)">🚛 نقلات بالمشروع</button>
+  </div>
+
+  <!-- DAYS TABLE -->
+  <div class="section" id="tabDays">
+    <div class="stitle">📅 ملخص أيام كل سائق</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>السائق</th><th>عمل</th><th>راحة</th><th>مرضى</th><th>إجازة</th><th>انتظار</th><th>غياب</th><th>ايام اضافى</th><th>إضافى اجازة</th><th>النقلات</th><th>نقلات×2</th><th>أيام×260</th><th>الراتب</th></tr></thead>
+      <tbody id="daysBody"></tbody>
+    </table></div>
+  </div>
+
+  <!-- TRIPS TABLE -->
+  <div class="section" id="tabTrips" style="display:none">
+    <div class="stitle">🚛 نقلات كل سائق في كل مشروع</div>
+    <div class="tbl-wrap"><table><thead id="tripsHead"></thead><tbody id="tripsBody"></tbody></table></div>
+  </div>
+
+</div>
+
+<div class="footer"><p>Naolon Transport © 2026 🚛 | Powered by <span>Waleed Salah</span> • GitHub Live v1.0</p></div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="mhdr">
+      <div>
+        <div style="font-size:17px;font-weight:900;color:white" id="mName"></div>
+        <div style="font-size:11px;color:var(--green)" id="mId"></div>
+      </div>
+      <button class="mclose" id="mCloseBtn">✕</button>
+    </div>
+    <div class="mtabs" id="mTabs"></div>
+    <div class="mbody" id="mBody"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// ─── STATE ───────────────────────────────────────
+var months = [];      // [{label, emps}]
+var active = [];
+var charts = {};
+var currentEmpId = null;
+var modalMode = 'all';
+var COLS = ['#10b981','#3b82f6','#f59e0b','#a855f7','#ef4444','#06b6d4','#f97316','#84cc16','#ec4899','#14b8a6'];
+
+// ─── FORMAT ──────────────────────────────────────
+function fc(n){return new Intl.NumberFormat('en-US').format(Math.round(n))+' ج.م';}
+function fn(n){return new Intl.NumberFormat('en-US').format(n);}
+
+// ─── GITHUB LOADER ───────────────────────────────
+// ─── EXCEL FILES ─────────────────────────────────
+var pendingFiles = [];
+
+function handleFiles(files){
+  Array.from(files).forEach(function(f){
+    if(!pendingFiles.find(function(x){return x.name===f.name;})){
+      pendingFiles.push(f);
+    }
+  });
+  renderFilesList();
+  document.getElementById('loadBtn').disabled = pendingFiles.length===0;
+}
+
+function renderFilesList(){
+  document.getElementById('filesList').innerHTML = pendingFiles.map(function(f,i){
+    return '<div class="file-chip">📊 '+f.name+
+      '<button onclick="removeFile('+i+')">✕</button></div>';
+  }).join('');
+}
+
+function removeFile(i){
+  pendingFiles.splice(i,1);
+  renderFilesList();
+  document.getElementById('loadBtn').disabled = pendingFiles.length===0;
+}
+
+// Drag & Drop
+var dz = document.getElementById('dropZone');
+if(dz){
+  dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('drag');});
+  dz.addEventListener('dragleave',function(){dz.classList.remove('drag');});
+  dz.addEventListener('drop',function(e){
+    e.preventDefault();dz.classList.remove('drag');
+    handleFiles(e.dataTransfer.files);
+  });
+}
+
+async function processFiles(){
+  if(!pendingFiles.length) return;
+  var btn=document.getElementById('loadBtn');
+  btn.disabled=true; btn.textContent='⏳ جاري التحليل...';
+  months=[];
+  
+  // نحمّل SheetJS
+  if(!window.XLSX){
+    await new Promise(function(res,rej){
+      var s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+      s.onload=res; s.onerror=rej;
+      document.head.appendChild(s);
+    });
+  }
+  
+  for(var i=0;i<pendingFiles.length;i++){
+    var f=pendingFiles[i];
+    try{
+      var data=await readExcel(f);
+      var label=f.name.replace(/\.xlsx?$/i,'').replace(/naolon-salary-/i,'').trim();
+      var emps=parseExcelData(data);
+      if(emps && emps.length) months.push({label:label, emps:emps});
+    }catch(e){ console.warn('Error in '+f.name,e); }
+  }
+  
+  months.sort(function(a,b){return a.label.localeCompare(b.label,'ar');});
+  active=months.map(function(m){return m.label;});
+  
+  if(!months.length){
+    alert('❌ لم يتم العثور على بيانات صحيحة في الملفات');
+    btn.disabled=false; btn.textContent='🚀 تحليل البيانات';
+    return;
+  }
+  
+  document.getElementById('loadingMsg').textContent='✅ تم تحميل '+months.length+' شهر';
+  document.querySelector('.save-btn').style.display='';
+  renderAll();
+  btn.disabled=false; btn.textContent='🔄 إعادة التحليل';
+}
+
+function readExcel(file){
+  return new Promise(function(resolve,reject){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      try{
+        var wb=XLSX.read(e.target.result,{type:'binary'});
+        var ws=wb.Sheets[wb.SheetNames[0]];
+        var json=XLSX.utils.sheet_to_json(ws,{defval:''});
+        resolve(json);
+      }catch(err){reject(err);}
+    };
+    reader.onerror=reject;
+    reader.readAsBinaryString(file);
+  });
+}
+
+function parseExcelData(rows){
+  if(!rows||!rows.length) return [];
+  
+  // كشف أسماء الأعمدة بمرونة
+  var sample=rows[0];
+  var keys=Object.keys(sample);
+  
+  function findCol(patterns){
+    return keys.find(function(k){
+      return patterns.some(function(p){return k.toString().toLowerCase().indexOf(p)>=0;});
+    })||null;
+  }
+  
+  var cCode  = findCol(['كود','code','id','رقم']);
+  var cName  = findCol(['اسم','name','سائق','driver']);
+  var cWork  = findCol(['عمل','work','حضور','attend']);
+  var cOff   = findCol(['راحة','off','اجازه اسبوعيه','إجازة أ']);
+  var cSick  = findCol(['مرض','sick','مرضى']);
+  var cVac   = findCol(['اجازة','vacation','vac','إجازة س']);
+  var cWait  = findCol(['انتظار','wait']);
+  var cAbs   = findCol(['غياب','abs','absence']);
+  var cOT    = findCol(['اضافى','overtime','ot','إضافي']);
+  var cExH   = findCol(['اضافى اجازة','exh','extra']);
+  var cTrips = findCol(['نقلة','trips','نقل','عدد']);
+  var cAmt   = findCol(['مبلغ','amount','قيمة','amt']);
+  var cProj  = findCol(['مشروع','project','proj','موقع']);
+  
+  // تجميع السواقين - كل سطر قد يكون نقلة
+  var map={};
+  rows.forEach(function(r){
+    var code=String(r[cCode]||'').trim();
+    var name=String(r[cName]||'').trim();
+    if(!code&&!name) return;
+    var id=code||name;
+    if(!map[id]){
+      map[id]={
+        id:id, name:name||code,
+        work:parseFloat(r[cWork])||0,
+        off:parseFloat(r[cOff])||0,
+        sick:parseFloat(r[cSick])||0,
+        vac:parseFloat(r[cVac])||0,
+        wait:parseFloat(r[cWait])||0,
+        abs:parseFloat(r[cAbs])||0,
+        ot:parseFloat(r[cOT])||0,
+        exH:parseFloat(r[cExH])||0,
+        totCnt:0, totAmt:0, byProj:{}
+      };
+    }
+    var e=map[id];
+    var cnt=parseFloat(r[cTrips])||0;
+    var amt=parseFloat(r[cAmt])||0;
+    var proj=String(r[cProj]||'أخرى').trim()||'أخرى';
+    if(cnt||amt){
+      e.totCnt+=cnt; e.totAmt+=amt;
+      if(!e.byProj[proj])e.byProj[proj]={cnt:0,amt:0};
+      e.byProj[proj].cnt+=cnt; e.byProj[proj].amt+=amt;
+    }
+    // لو أيام في نفس السطر مع النقلة - خد الأكبر
+    if(cWork&&r[cWork]) e.work=Math.max(e.work,parseFloat(r[cWork])||0);
+  });
+  
+  return Object.values(map).map(function(e){
+    e.salary=(e.totAmt*2)+(e.work*260);
+    return e;
+  }).filter(function(e){return e.name;});
+}
+
+
+
+// ─── EXTRACT DATA FROM HTML ───────────────────────
+function extractEmployees(html){
+  var match = html.match(/const employeesDatabase=(\[[\s\S]*?\]);/);
+  if(!match) return null;
+  try {
+    var emps = JSON.parse(match[1]);
+    return emps.map(function(e){
+      var byProj = {};
+      (e.trips||[]).forEach(function(t){
+        var loc = t.location ? t.location.replace(/^\d+-/,'').trim() : 'أخرى';
+        if(!byProj[loc]) byProj[loc]={cnt:0,amt:0};
+        byProj[loc].cnt += t.count||0;
+        byProj[loc].amt += t.amount||0;
+      });
+      var sal = (e.totalTripsValue||0)*2 + (e.workDays||0)*260;
+      return {
+        id: e.id, name: e.name,
+        work: e.workDays||0, off: e.daysOff||0, sick: e.sick||0,
+        vac: e.vacation||0, wait: e.wait||0, abs: e.absence||0,
+        ot: e.overtime||0, exH: e.extraHoliday||0,
+        totCnt: e.totalTrips||0, totAmt: e.totalTripsValue||0,
+        salary: sal, trips: e.trips||[], byProj: byProj
+      };
+    });
+  } catch(e){ return null; }
+}
+
+function extractLabel(path, html){
+  // Try from title tag
+  var t = html.match(/<title>[^<]*نقلات[^<]*شهر[^<]*?([^|<]+)<\/title>/);
+  if(t) return t[1].trim();
+  // Try from filename
+  var f = path.replace(/.*\//,'').replace('naolon-salary-','').replace(/\.html$/i,'');
+  f = f.replace(/-v\d+$/i,'').replace(/_v\d+$/i,'').replace(/_/g,' ').trim();
+  return f || path;
+}
+
+// ─── MERGE ───────────────────────────────────────
+function merged(){
+  var map={};
+  months.filter(function(m){return active.indexOf(m.label)>=0;}).forEach(function(mo){
+    mo.emps.forEach(function(e){
+      if(!map[e.id]){map[e.id]={id:e.id,name:e.name,work:0,off:0,sick:0,vac:0,wait:0,abs:0,ot:0,exH:0,totCnt:0,totAmt:0,salary:0,byProj:{}};}
+      var m=map[e.id];
+      m.work+=e.work;m.off+=e.off;m.sick+=e.sick;m.vac+=e.vac;
+      m.wait+=e.wait;m.abs+=e.abs;m.ot+=e.ot;m.exH+=e.exH;
+      m.totCnt+=e.totCnt;m.totAmt+=e.totAmt;m.salary+=e.salary;
+      Object.keys(e.byProj).forEach(function(k){
+        if(!m.byProj[k])m.byProj[k]={cnt:0,amt:0};
+        m.byProj[k].cnt+=e.byProj[k].cnt;m.byProj[k].amt+=e.byProj[k].amt;
+      });
+    });
+  });
+  return Object.values(map).sort(function(a,b){return b.totAmt-a.totAmt;});
+}
+
+function projTotals(emps){
+  var p={};
+  emps.forEach(function(e){Object.keys(e.byProj).forEach(function(k){
+    if(!p[k])p[k]={cnt:0,amt:0};
+    p[k].cnt+=e.byProj[k].cnt;p[k].amt+=e.byProj[k].amt;
+  });});
+  return Object.entries(p).sort(function(a,b){return b[1].amt-a[1].amt;});
+}
+
+// ─── RENDER ALL ──────────────────────────────────
+function renderAll(){
+  // Month filters
+  var latest = months[months.length-1].label;
+  document.getElementById('mFilters').innerHTML = months.map(function(m){
+    var on = active.indexOf(m.label)>=0;
+    var lat = m.label===latest;
+    return '<button class="fbtn'+(on?' on':'')+(lat?' latest':'')+'" onclick="toggleMonth(\''+m.label+'\')">' + m.label + '</button>';
+  }).join('');
+
+  var emps = merged();
+  var projs = projTotals(emps);
+  var totAmt = emps.reduce(function(a,e){return a+e.totAmt;},0);
+  var totCnt = emps.reduce(function(a,e){return a+e.totCnt;},0);
+
+  document.getElementById('sTotal').textContent   = fc(totAmt);
+  document.getElementById('sTrips').textContent   = fn(totCnt)+' نقلة';
+  document.getElementById('sDrivers').textContent = emps.length+' سائق';
+  document.getElementById('sProjects').textContent= projs.length+' مشروع';
+  document.getElementById('sMonths').textContent  = active.length+' شهر';
+  document.getElementById('hdrSub').textContent   = months.length+' شهر محمل | '+active.length+' مفعّل';
+
+  drawCharts(emps,projs);
+  drawProjBars(projs);
+  drawSalaryDist();
+  drawDays(emps);
+  drawTrips(emps,projs);
+}
+
+function toggleMonth(lbl){
+  var i=active.indexOf(lbl);
+  if(i>=0){if(active.length===1)return;active.splice(i,1);}
+  else active.push(lbl);
+  renderAll();
+}
+
+// ─── CHARTS ──────────────────────────────────────
+function destroyChart(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
+
+function drawCharts(emps,projs){
+  destroyChart('m');
+  var mData=months.filter(function(m){return active.indexOf(m.label)>=0;}).map(function(mo){
+    return {l:mo.label,v:mo.emps.reduce(function(a,e){return a+e.totAmt;},0)};
+  });
+  charts['m']=new Chart(document.getElementById('chMonth'),{type:'bar',
+    data:{labels:mData.map(function(d){return d.l;}),
+      datasets:[{data:mData.map(function(d){return d.v;}),backgroundColor:COLS.map(function(c){return c+'44';}),borderColor:COLS,borderWidth:2,borderRadius:8}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return ' '+fc(c.raw);}}}},
+      scales:{x:{ticks:{color:'#94a3b8',font:{family:'Cairo',size:11}},grid:{color:'rgba(255,255,255,0.03)'}},
+              y:{ticks:{color:'#94a3b8',font:{family:'Cairo',size:10},callback:function(v){return fn(v);}},grid:{color:'rgba(255,255,255,0.03)'}}}}});
+
+  destroyChart('p');
+  var top8=projs.slice(0,8);
+  charts['p']=new Chart(document.getElementById('chProj'),{type:'doughnut',
+    data:{labels:top8.map(function(p){return p[0];}),datasets:[{data:top8.map(function(p){return p[1].amt;}),backgroundColor:COLS,borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
+      plugins:{legend:{position:'right',labels:{color:'#94a3b8',font:{family:'Cairo',size:10},boxWidth:10,padding:6}},
+        tooltip:{callbacks:{label:function(c){return ' '+fc(c.raw);}}}}}});
+
+  destroyChart('d');
+  var top15=emps.slice(0,15);
+  charts['d']=new Chart(document.getElementById('chDrivers'),{type:'bar',
+    data:{labels:top15.map(function(e){return e.name.split(' ').slice(0,2).join(' ');}),
+      datasets:[
+        {label:'المبلغ',data:top15.map(function(e){return e.totAmt;}),backgroundColor:'rgba(16,185,129,0.3)',borderColor:'#10b981',borderWidth:2,borderRadius:5},
+        {label:'النقلات ×500',data:top15.map(function(e){return e.totCnt*500;}),backgroundColor:'rgba(59,130,246,0.2)',borderColor:'#3b82f6',borderWidth:2,borderRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#94a3b8',font:{family:'Cairo',size:11}}},tooltip:{callbacks:{label:function(c){return c.datasetIndex===0?' '+fc(c.raw):' '+fn(Math.round(c.raw/500))+' نقلة';}}}},
+      scales:{x:{ticks:{color:'#94a3b8',font:{family:'Cairo',size:10},maxRotation:40},grid:{color:'rgba(255,255,255,0.03)'}},
+              y:{ticks:{color:'#94a3b8',font:{family:'Cairo',size:10},callback:function(v){return fn(v);}},grid:{color:'rgba(255,255,255,0.03)'}}}}});
+}
+
+// ─── PROJ BARS ───────────────────────────────────
+function drawProjBars(projs){
+  var max=projs.length?projs[0][1].amt:1;
+  document.getElementById('projBars').innerHTML=projs.map(function(p,i){
+    var pct=Math.max(6,Math.round(p[1].amt/max*100));
+    var c=COLS[i%COLS.length];
+    return '<div class="prow"><div class="pname">'+p[0]+'</div>'+
+      '<div class="pbar-bg"><div class="pbar" style="width:'+pct+'%;background:'+c+'33;border:1px solid '+c+'55;color:'+c+'">'+p[1].cnt+' نقلة</div></div>'+
+      '<div class="pamount">'+fc(p[1].amt)+'</div></div>';
+  }).join('');
+}
+
+// ─── SALARY DIST ─────────────────────────────────
+var brackets=[
+  {lbl:'0 — 10,000',min:0,max:10000,color:'#3b82f6'},
+  {lbl:'10,001 — 20,000',min:10001,max:20000,color:'#10b981'},
+  {lbl:'20,001 — 25,000',min:20001,max:25000,color:'#f59e0b'},
+  {lbl:'25,001 — 30,000',min:25001,max:30000,color:'#a855f7'},
+  {lbl:'30,001 — 35,000',min:30001,max:35000,color:'#ef4444'},
+  {lbl:'35,001+',min:35001,max:Infinity,color:'#06b6d4'}
+];
+window._bracketData={};
+
+function drawSalaryDist(){
+  var activeMos=months.filter(function(m){return active.indexOf(m.label)>=0;});
+  document.getElementById('salaryDist').innerHTML=activeMos.map(function(mo){
+    var sals=mo.emps.map(function(e){return e.salary;});
+    var total=sals.length;
+    var maxCnt=0;
+    var counts=brackets.map(function(b){
+      var cnt=sals.filter(function(s){return s>=b.min&&s<=b.max;}).length;
+      if(cnt>maxCnt)maxCnt=cnt;return cnt;
+    });
+    var rows=brackets.map(function(b,i){
+      var cnt=counts[i];
+      var pct=total>0?Math.round(cnt/total*100):0;
+      var barW=maxCnt>0?Math.round(cnt/maxCnt*100):0;
+      var key='br_'+mo.label+'_'+i;
+      window._bracketData[key]={
+        lbl:b.lbl, mo:mo.label,
+        drivers:mo.emps.filter(function(e){return e.salary>=b.min&&e.salary<=b.max;})
+          .map(function(e){return {name:e.name,code:e.id,sal:e.salary};})
+          .sort(function(a,b){return b.sal-a.sal;})
+      };
+      return '<div class="dist-row" onclick="showBracketDrivers(\''+key+'\')">'+
+        '<div class="dist-lbl">'+b.lbl+'</div>'+
+        '<div class="dist-cnt" style="color:'+b.color+'">'+cnt+'</div>'+
+        '<div class="dist-pct">'+pct+'%</div>'+
+        '<div class="dist-bar-bg"><div class="dist-bar" style="width:'+barW+'%;background:'+b.color+'55"></div></div>'+
+        '<span style="font-size:10px;color:var(--muted);margin-right:4px">👁</span>'+
+      '</div>';
+    }).join('');
+    // Total row
+    rows+='<div style="border-top:1px solid rgba(255,255,255,0.08);padding:6px 4px;display:flex;gap:8px;margin-top:4px">'+
+      '<div style="flex:1;font-size:11px;font-weight:900;color:var(--gold)">الإجمالي</div>'+
+      '<div style="font-size:13px;font-weight:900;color:var(--gold);min-width:30px;text-align:center">'+total+'</div>'+
+      '<div style="font-size:11px;font-weight:700;color:var(--gold);min-width:35px;text-align:center">100%</div>'+
+    '</div>';
+    return '<div class="dist-card">'+
+      '<div class="dist-card-title">'+mo.label+'</div>'+rows+'</div>';
+  }).join('');
+}
+
+// ─── BRACKET MODAL ───────────────────────────────
+function showBracketDrivers(key){
+  var data=window._bracketData[key];
+  if(!data)return;
+  var rows=data.drivers.map(function(d,i){
+    return '<tr>'+
+      '<td class="tm" style="text-align:center">'+(i+1)+'</td>'+
+      '<td class="tn">'+d.name+'</td>'+
+      '<td class="tm" style="font-size:11px">'+d.code+'</td>'+
+      '<td class="tg">'+fc(d.sal)+'</td>'+
+    '</tr>';
+  }).join('');
+  document.getElementById('mName').textContent=data.lbl+' ج.م';
+  document.getElementById('mId').textContent=data.mo+' — '+data.drivers.length+' سائق';
+  document.getElementById('mTabs').innerHTML='';
+  document.getElementById('mBody').innerHTML=
+    '<div style="text-align:center;padding:14px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;margin-bottom:14px">'+
+      '<span style="font-size:24px;font-weight:900;color:var(--green)">'+data.drivers.length+'</span>'+
+      '<span style="font-size:13px;color:var(--muted);margin-right:8px"> سائق في هذه الفئة</span>'+
+    '</div>'+
+    '<div class="tbl-wrap"><table>'+
+      '<thead><tr><th style="text-align:center">#</th><th>اسم السائق</th><th>الكود</th><th>الراتب</th></tr></thead>'+
+      '<tbody>'+(rows||'<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">لا يوجد</td></tr>')+'</tbody>'+
+    '</table></div>';
+  document.getElementById('overlay').classList.add('show');
+}
+
+// ─── TABLES ──────────────────────────────────────
+function getQ(){return document.getElementById('searchQ').value.trim().toLowerCase();}
+function filterEmps(emps){var q=getQ();return q?emps.filter(function(e){return e.name.toLowerCase().indexOf(q)>=0||e.id.indexOf(q)>=0;}):emps;}
+
+function drawDays(emps){
+  var fe=filterEmps(emps);
+  document.getElementById('daysBody').innerHTML=fe.map(function(e,i){
+    return '<tr onclick="openModal(\''+e.id+'\')">'+
+      '<td class="tm">'+(i+1)+'</td>'+
+      '<td class="tn">'+e.name+'<br><span class="tm" style="font-size:10px">'+e.id+'</span></td>'+
+      '<td><span class="db dw">'+e.work+'</span></td>'+
+      '<td><span class="db do">'+e.off+'</span></td>'+
+      '<td><span class="db ds">'+e.sick+'</span></td>'+
+      '<td><span class="db dv">'+e.vac+'</span></td>'+
+      '<td><span class="db dwt">'+e.wait+'</span></td>'+
+      '<td><span class="db da">'+e.abs+'</span></td>'+
+      '<td class="tb">'+e.ot+'</td>'+
+      '<td class="tp">'+e.exH+'</td>'+
+      '<td class="tg">'+e.totCnt+' نقلة</td>'+
+      '<td class="tg">'+fc(e.totAmt*2)+'</td>'+
+      '<td class="tb">'+fc(e.work*260)+'</td>'+
+      '<td class="tgold">'+fc(e.salary)+'</td>'+
+    '</tr>';
+  }).join('');
+}
+
+function drawTrips(emps,projs){
+  var fe=filterEmps(emps);
+  var pl=projs.map(function(p){return p[0];});
+  document.getElementById('tripsHead').innerHTML='<tr><th>#</th><th>السائق</th>'+
+    pl.map(function(p){return '<th>'+p+'</th>';}).join('')+'<th class="tgold">الإجمالي</th></tr>';
+  document.getElementById('tripsBody').innerHTML=fe.map(function(e,i){
+    return '<tr onclick="openModal(\''+e.id+'\')">'+
+      '<td class="tm">'+(i+1)+'</td><td class="tn">'+e.name+'</td>'+
+      pl.map(function(p){
+        var t=e.byProj[p];
+        if(!t||!t.cnt)return '<td class="tm" style="text-align:center">—</td>';
+        return '<td style="text-align:center"><span class="tg">'+t.cnt+'</span><br><span class="tm" style="font-size:10px">'+fc(t.amt)+'</span></td>';
+      }).join('')+
+      '<td class="tgold">'+fc(e.totAmt)+'</td></tr>';
+  }).join('');
+}
+
+// ─── TABS ────────────────────────────────────────
+function showTab(tab,btn){
+  document.querySelectorAll('.tabBtn').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  document.getElementById('tabDays').style.display=tab==='days'?'block':'none';
+  document.getElementById('tabTrips').style.display=tab==='trips'?'block':'none';
+}
+
+// ─── SEARCH ──────────────────────────────────────
+document.getElementById('searchQ').oninput=function(){
+  var e=merged(),p=projTotals(e);
+  drawDays(e);drawTrips(e,p);
+};
+
+// ─── MODAL ───────────────────────────────────────
+function getEmpMonth(id,lbl){
+  var mo=months.find(function(m){return m.label===lbl;});
+  if(!mo)return null;
+  return mo.emps.find(function(e){return e.id===id;})||null;
+}
+
+function openModal(id){
+  currentEmpId=id;modalMode='all';
+  var anyEmp=null;
+  for(var i=0;i<months.length;i++){anyEmp=months[i].emps.find(function(e){return e.id===id;});if(anyEmp)break;}
+  if(!anyEmp)return;
+  document.getElementById('mName').textContent=anyEmp.name;
+  document.getElementById('mId').textContent='كود: '+id;
+  var tabs='<button class="mtab on" id="mt-all" onclick="setMMode(\'all\')">📊 الإجمالي</button>';
+  months.forEach(function(m){tabs+='<button class="mtab" id="mt-'+m.label.replace(/ /g,'_')+'" onclick="setMMode(\'m:'+m.label+'\')">'+m.label+'</button>';});
+  var opts=months.map(function(m){return '<option value="'+m.label+'">'+m.label+'</option>';}).join('');
+  tabs+='<div class="mcmp"><button class="mtab cmp" id="mt-cmp" onclick="setMMode(\'cmp\')">⚖️ مقارنة</button>'+
+    '<select id="cmpA" onchange="if(modalMode===\'cmp\')renderMBody()">'+opts+'</select>'+
+    '<span style="color:var(--muted)">vs</span>'+
+    '<select id="cmpB" onchange="if(modalMode===\'cmp\')renderMBody()">'+opts+'</select></div>';
+  document.getElementById('mTabs').innerHTML=tabs;
+  if(months.length>1)setTimeout(function(){var b=document.getElementById('cmpB');if(b)b.selectedIndex=1;},50);
+  renderMBody();
+  document.getElementById('overlay').classList.add('show');
+}
+
+function setMMode(mode){
+  modalMode=mode;
+  document.querySelectorAll('.mtab').forEach(function(b){b.classList.remove('on');});
+  var bid=mode==='all'?'mt-all':mode==='cmp'?'mt-cmp':'mt-'+mode.replace('m:','').replace(/ /g,'_');
+  var b=document.getElementById(bid);if(b)b.classList.add('on');
+  renderMBody();
+}
+
+function renderMBody(){
+  if(!currentEmpId)return;
+  if(modalMode==='cmp'){renderCmp(currentEmpId);return;}
+  var emp;
+  if(modalMode==='all'){var all=merged();emp=all.find(function(e){return e.id===currentEmpId;});}
+  else{emp=getEmpMonth(currentEmpId,modalMode.replace('m:',''));}
+  if(!emp){document.getElementById('mBody').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">لا توجد بيانات</div>';return;}
+  // Build byProj if single month
+  if(modalMode!=='all'&&!emp.byProj){
+    emp.byProj={};
+    (emp.trips||[]).forEach(function(t){
+      var loc=t.location?t.location.replace(/^\d+-/,'').trim():'أخرى';
+      if(!emp.byProj[loc])emp.byProj[loc]={cnt:0,amt:0};
+      emp.byProj[loc].cnt+=t.count||0;emp.byProj[loc].amt+=t.amount||0;
+    });
+    emp.salary=emp.salary||(emp.totAmt*2+emp.work*260);
+  }
+  var pr=Object.entries(emp.byProj||{}).sort(function(a,b){return b[1].amt-a[1].amt;}).map(function(p){
+    return '<tr><td class="tn">'+p[0]+'</td><td class="tg" style="text-align:center">'+p[1].cnt+' نقلة</td><td class="tgold">'+fc(p[1].amt)+'</td></tr>';
+  }).join('');
+  document.getElementById('mBody').innerHTML=
+    '<div class="mini-grid g3" style="margin-bottom:14px">'+
+      mbox('💰','إجمالي المبلغ',fc(emp.totAmt),'rgba(16,185,129,0.08)','rgba(16,185,129,0.2)','var(--green)')+
+      mbox('🚛','إجمالي النقلات',fn(emp.totCnt)+' نقلة','rgba(59,130,246,0.08)','rgba(59,130,246,0.2)','var(--blue)')+
+      mbox('💵','الراتب',fc(emp.salary||0),'rgba(245,158,11,0.08)','rgba(245,158,11,0.2)','var(--gold)')+
+    '</div>'+
+    '<div class="mini-grid g4" style="margin-bottom:14px">'+
+      mini('عمل',emp.work,'var(--green)')+mini('راحة',emp.off,'var(--blue)')+
+      mini('مرضى',emp.sick,'var(--red)')+mini('إجازة',emp.vac,'var(--purple)')+
+      mini('انتظار',emp.wait,'var(--gold)')+mini('غياب',emp.abs,'#fca5a5')+
+      mini('ايام اضافى',emp.ot,'var(--blue)')+mini('إضافى اجازة',emp.exH,'var(--purple)')+
+    '</div>'+
+    '<div class="stitle" style="margin-bottom:10px">📦 النقلات بالمشروع</div>'+
+    '<div class="tbl-wrap"><table><thead><tr><th>المشروع</th><th>النقلات</th><th>المبلغ</th></tr></thead>'+
+    '<tbody>'+(pr||'<tr><td colspan="3" style="text-align:center;color:var(--muted)">—</td></tr>')+'</tbody></table></div>';
+}
+
+function renderCmp(id){
+  var lA=document.getElementById('cmpA')?document.getElementById('cmpA').value:'';
+  var lB=document.getElementById('cmpB')?document.getElementById('cmpB').value:'';
+  var eA=getEmpMonth(id,lA),eB=getEmpMonth(id,lB);
+  function dc(a,b){return a>b?'up':a<b?'dn':'eq';}
+  function di(a,b){return a>b?'▲':a<b?'▼':'=';}
+  var dayKeys=[['work','عمل'],['off','راحة'],['sick','مرضى'],['vac','إجازة'],['wait','انتظار'],['abs','غياب'],['ot','ايام اضافى'],['exH','إضافى اجازة']];
+  var dRows=dayKeys.map(function(dk){
+    var vA=eA?eA[dk[0]]:0,vB=eB?eB[dk[0]]:0,d=vA-vB;
+    return '<tr><td class="tn">'+dk[1]+'</td>'+
+      '<td style="text-align:center;color:var(--green);font-weight:700">'+(eA?vA:'—')+'</td>'+
+      '<td style="text-align:center;color:var(--blue);font-weight:700">'+(eB?vB:'—')+'</td>'+
+      '<td style="text-align:center" class="'+dc(vA,vB)+'">'+di(vA,vB)+' '+(d>0?'+':'')+d+'</td></tr>';
+  }).join('');
+  var allP={};
+  if(eA)Object.keys(eA.byProj||{}).forEach(function(k){allP[k]=1;});
+  if(eB)Object.keys(eB.byProj||{}).forEach(function(k){allP[k]=1;});
+  var pRows=Object.keys(allP).map(function(p){
+    var tA=eA&&eA.byProj[p]?eA.byProj[p]:{cnt:0,amt:0};
+    var tB=eB&&eB.byProj[p]?eB.byProj[p]:{cnt:0,amt:0};
+    var d=tA.amt-tB.amt;
+    return '<tr><td class="tn">'+p+'</td>'+
+      '<td style="text-align:center"><span class="tg">'+tA.cnt+'</span><br><span class="tm" style="font-size:10px">'+fc(tA.amt)+'</span></td>'+
+      '<td style="text-align:center"><span class="tb">'+tB.cnt+'</span><br><span class="tm" style="font-size:10px">'+fc(tB.amt)+'</span></td>'+
+      '<td style="text-align:center" class="'+dc(d,0)+'">'+di(d,0)+' '+fc(Math.abs(d))+'</td></tr>';
+  }).join('');
+  document.getElementById('mBody').innerHTML=
+    '<div class="mini-grid" style="grid-template-columns:1fr 1fr;margin-bottom:16px">'+
+      mbox('',lA,(eA?fc(eA.totAmt):'لا بيانات'),'rgba(16,185,129,0.06)','rgba(16,185,129,0.15)','var(--green)')+
+      mbox('',lB,(eB?fc(eB.totAmt):'لا بيانات'),'rgba(59,130,246,0.06)','rgba(59,130,246,0.15)','var(--blue)')+
+    '</div>'+
+    '<div class="stitle" style="margin-bottom:10px">📅 مقارنة الأيام</div>'+
+    '<div class="tbl-wrap" style="margin-bottom:14px"><table><thead><tr>'+
+      '<th>اليوم</th><th style="color:var(--green)">'+lA+'</th><th style="color:var(--blue)">'+lB+'</th><th style="color:var(--gold)">الفرق</th>'+
+    '</tr></thead><tbody>'+dRows+'</tbody></table></div>'+
+    '<div class="stitle" style="margin-bottom:10px">📦 مقارنة النقلات</div>'+
+    '<div class="tbl-wrap"><table><thead><tr>'+
+      '<th>المشروع</th><th style="color:var(--green)">'+lA+'</th><th style="color:var(--blue)">'+lB+'</th><th style="color:var(--gold)">الفرق</th>'+
+    '</tr></thead><tbody>'+pRows+'</tbody></table></div>';
+}
+
+function mbox(icon,lbl,val,bg,border,color){
+  return '<div style="background:'+bg+';border:1px solid '+border+';border-radius:12px;padding:14px;text-align:center">'+
+    (icon?'<div style="font-size:18px;margin-bottom:4px">'+icon+'</div>':'')+
+    '<div style="font-size:16px;font-weight:900;color:'+color+'">'+val+'</div>'+
+    (lbl?'<div style="font-size:10px;color:var(--muted)">'+lbl+'</div>':'')+
+    '</div>';
+}
+function mini(lbl,val,color){
+  return '<div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:8px;text-align:center">'+
+    '<div style="font-size:15px;font-weight:800;color:'+color+'">'+val+'</div>'+
+    '<div style="font-size:10px;color:var(--muted)">'+lbl+'</div></div>';
+}
+
+// ─── SAVE ────────────────────────────────────────
+function saveDashboard(){
+  var emps=merged(),projs=projTotals(emps);
+  var totAmt=emps.reduce(function(a,e){return a+e.totAmt;},0);
+  var totCnt=emps.reduce(function(a,e){return a+e.totCnt;},0);
+  var label=active.join(' | ');
+  var now=new Date().toLocaleDateString('en-GB');
+  var chartMImg=document.getElementById('chMonth')?document.getElementById('chMonth').toDataURL('image/png'):'';
+  var chartPImg=document.getElementById('chProj')?document.getElementById('chProj').toDataURL('image/png'):'';
+  var chartDImg=document.getElementById('chDrivers')?document.getElementById('chDrivers').toDataURL('image/png'):'';
+  var projRows=projs.map(function(p,i){
+    var pct=projs[0][1].amt>0?Math.round(p[1].amt/projs[0][1].amt*100):0;
+    var c=COLS[i%COLS.length];
+    return '<tr><td>'+p[0]+'</td><td style="text-align:center;color:#10b981;font-weight:700">'+p[1].cnt+'</td>'+
+      '<td style="color:#10b981;font-weight:700">'+fc(p[1].amt)+'</td>'+
+      '<td><div style="background:rgba(255,255,255,0.05);border-radius:4px;height:8px"><div style="width:'+pct+'%;height:100%;background:'+c+';border-radius:4px"></div></div></td></tr>';
+  }).join('');
+  var daysRows=emps.map(function(e,i){
+    return '<tr><td style="color:#64748b;text-align:center">'+(i+1)+'</td>'+
+      '<td style="color:white;font-weight:700">'+e.name+'</td>'+
+      '<td style="text-align:center;color:#10b981">'+e.work+'</td>'+
+      '<td style="text-align:center;color:#3b82f6">'+e.off+'</td>'+
+      '<td style="text-align:center;color:#ef4444">'+e.sick+'</td>'+
+      '<td style="text-align:center;color:#a855f7">'+e.vac+'</td>'+
+      '<td style="text-align:center;color:#f59e0b">'+e.wait+'</td>'+
+      '<td style="text-align:center;color:#fca5a5">'+e.abs+'</td>'+
+      '<td style="text-align:center;color:#3b82f6">'+e.ot+'</td>'+
+      '<td style="text-align:center;color:#a855f7">'+e.exH+'</td>'+
+      '<td style="text-align:center;color:#10b981;font-weight:700">'+e.totCnt+'</td>'+
+      '<td style="color:#10b981;font-weight:700">'+fc(e.totAmt*2)+'</td>'+
+      '<td style="color:#3b82f6;font-weight:700">'+fc(e.work*260)+'</td>'+
+      '<td style="color:#f59e0b;font-weight:900">'+fc(e.salary)+'</td></tr>';
+  }).join('');
+  var distHTML=active.map(function(lbl2){
+    var mo=months.find(function(m){return m.label===lbl2;});if(!mo)return '';
+    var sals=mo.emps.map(function(e){return e.salary;});var total=sals.length;
+    return '<div style="flex:1;min-width:260px"><h3 style="color:#10b981;font-size:13px;font-weight:800;margin-bottom:10px;text-align:center">'+lbl2+'</h3>'+
+      '<table><thead><tr><th>الفئة</th><th>العدد</th><th>النسبة</th></tr></thead><tbody>'+
+      brackets.map(function(b){
+        var cnt=sals.filter(function(s){return s>=b.min&&s<=b.max;}).length;
+        var pct=total>0?Math.round(cnt/total*100):0;
+        return '<tr><td>'+b.lbl+'</td><td style="text-align:center;color:'+b.color+';font-weight:700">'+cnt+'</td><td style="text-align:center;color:#64748b">'+pct+'%</td></tr>';
+      }).join('')+
+      '<tr style="border-top:1px solid rgba(245,158,11,0.3)"><td style="color:#f59e0b;font-weight:900">الإجمالي</td><td style="text-align:center;color:#f59e0b;font-weight:900">'+total+'</td><td style="text-align:center;color:#f59e0b;font-weight:900">100%</td></tr>'+
+      '</tbody></table></div>';
+  }).join('');
+  var html='<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8">'+
+    '<title>Naolon Dashboard — '+label+'</title>'+
+    '<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">'+
+    '<style>*{font-family:Cairo,sans-serif;margin:0;padding:0;box-sizing:border-box}body{background:#070d18;color:#f1f5f9;padding:20px}'+
+    '.card{background:rgba(13,24,41,0.95);border:1px solid rgba(16,185,129,0.15);border-radius:16px;padding:18px;margin-bottom:16px}'+
+    '.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}'+
+    '.stat{background:rgba(13,24,41,0.95);border:1px solid rgba(16,185,129,0.15);border-radius:14px;padding:16px;text-align:center}'+
+    '.sv{font-size:20px;font-weight:900;margin-bottom:4px}.sl{font-size:11px;color:#64748b}'+
+    'h2{color:#f59e0b;font-size:14px;font-weight:800;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(16,185,129,0.15)}'+
+    'table{width:100%;border-collapse:collapse;font-size:11px}'+
+    'th{background:rgba(16,185,129,0.1);padding:7px 10px;text-align:right;color:#a7f3d0;font-weight:800;white-space:nowrap}'+
+    'td{padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.04);white-space:nowrap}'+
+    'tr:hover td{background:rgba(16,185,129,0.03)}'+
+    '.dist-wrap{display:flex;gap:16px;flex-wrap:wrap}'+
+    '.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}'+
+    '.footer{text-align:center;color:#374151;font-size:11px;margin-top:16px;padding:12px}'+
+    '.footer span{color:#f59e0b;font-weight:800}</style></head><body>'+
+    '<div class="card"><h1 style="font-size:20px;font-weight:900;color:white;margin-bottom:4px">🚛 Naolon — الداشبورد التراكمي</h1>'+
+    '<p style="color:#10b981;font-size:12px">'+label+' | تاريخ الحفظ: '+now+'</p></div>'+
+    '<div class="g5">'+
+      '<div class="stat"><div class="sv" style="color:#10b981">'+fc(totAmt)+'</div><div class="sl">إجمالي المبلغ</div></div>'+
+      '<div class="stat"><div class="sv" style="color:#3b82f6">'+fn(totCnt)+' نقلة</div><div class="sl">إجمالي النقلات</div></div>'+
+      '<div class="stat"><div class="sv" style="color:#f59e0b">'+emps.length+' سائق</div><div class="sl">السائقين</div></div>'+
+      '<div class="stat"><div class="sv" style="color:#a855f7">'+projs.length+' مشروع</div><div class="sl">المشاريع</div></div>'+
+      '<div class="stat"><div class="sv" style="color:#ef4444">'+active.length+' شهر</div><div class="sl">الشهور</div></div>'+
+    '</div>'+
+    '<div class="card"><h2>📈 الرسوم البيانية</h2>'+
+      '<div class="g2" style="margin-bottom:12px">'+
+        (chartMImg?'<div><p style="font-size:11px;color:#f59e0b;font-weight:700;margin-bottom:6px">المبلغ الشهري</p><img src="'+chartMImg+'" style="width:100%;border-radius:8px"></div>':'')+
+        (chartPImg?'<div><p style="font-size:11px;color:#f59e0b;font-weight:700;margin-bottom:6px">توزيع المشاريع</p><img src="'+chartPImg+'" style="width:100%;border-radius:8px"></div>':'')+
+      '</div>'+
+      (chartDImg?'<p style="font-size:11px;color:#f59e0b;font-weight:700;margin-bottom:6px">أعلى 15 سائق</p><img src="'+chartDImg+'" style="width:100%;border-radius:8px">':'')+
+    '</div>'+
+    '<div class="card"><h2>📦 المشاريع</h2><table><thead><tr><th>المشروع</th><th>النقلات</th><th>المبلغ</th><th>النسبة</th></tr></thead><tbody>'+projRows+'</tbody></table></div>'+
+    '<div class="card"><h2>📅 ملخص أيام السائقين</h2><div style="overflow-x:auto">'+
+      '<table><thead><tr><th>#</th><th>السائق</th><th>عمل</th><th>راحة</th><th>مرضى</th><th>إجازة</th><th>انتظار</th><th>غياب</th><th>اضافى</th><th>إضافى ع</th><th>النقلات</th><th>نقلات×2</th><th>أيام×260</th><th>الراتب</th></tr></thead>'+
+      '<tbody>'+daysRows+'</tbody></table></div></div>'+
+    '<div class="card"><h2>💼 توزيع الرواتب</h2><div class="dist-wrap">'+distHTML+'</div></div>'+
+    '<div class="footer"><p>Naolon Transport © 2026 🚛 | Powered by <span>Waleed Salah</span></p></div>'+
+    '</body></html>';
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='naolon-dashboard-'+active.join('-')+'.html';
+  a.click();URL.revokeObjectURL(url);
+}
+
+// ─── MODAL CLOSE ─────────────────────────────────
+document.getElementById('mCloseBtn').onclick=function(){document.getElementById('overlay').classList.remove('show');};
+document.getElementById('overlay').onclick=function(e){if(e.target===this)this.classList.remove('show');};
+window.processFiles=processFiles;window.handleFiles=handleFiles;window.removeFile=removeFile;
+</script>
+</body>
+</html>
