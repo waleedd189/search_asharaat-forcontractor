@@ -80,6 +80,9 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
 .fv.danger{color:#f87171;font-weight:700}
 .fv.warn{color:#fbbf24;font-weight:700}
 .fv.ok{color:#34d399;font-weight:600}
+.field.start-field{background:#0a1f12}
+.field.start-field .fl{color:#4ade80}
+.field.start-field .fv{color:#4ade80;font-size:18px;font-weight:900}
 /* ========================== */
 
 .badge-row{display:flex;gap:6px;flex-wrap:wrap}
@@ -375,7 +378,7 @@ function doSearch(){
     html+=fld('انتهاء القاطرة',x.exp1,e1);
     html+=fld('المقطورة',x.plate2||x.num2,'');
     html+=fld('انتهاء المقطورة',x.exp2,e2);
-    html+=fld('أول الإشارة',x.start,'');
+    html+=fld('أول الإشارة',x.start,'','start-field');
     html+=fld('نهاية الإشارة',x.end, ps==='danger'?'danger':ps==='warn'?'warn':'');
     html+=fld('باقى على الانتهاء',x.remaining, ps==='danger'?'danger':ps==='warn'?'warn':'');
     html+='</div>';
@@ -390,8 +393,8 @@ function doSearch(){
   if(hits.length>50)html+='<div class="empty" style="padding:14px">يعرض أول 50 من '+hits.length+'</div>';
   resEl.innerHTML=html;
 }
-function fld(label,v,ec){
-  return'<div class="field"><div class="fl">'+label+'</div>'+(v?'<div class="fv '+(ec||'')+'">'+esc(v)+'</div>':'<div class="fv empty">—</div>')+'</div>';
+function fld(label,v,ec,fc){
+  return'<div class="field'+(fc?' '+fc:'')+'"><div class="fl">'+label+'</div>'+(v?'<div class="fv '+(ec||'')+'">'+esc(v)+'</div>':'<div class="fv empty">—</div>')+'</div>';
 }
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
