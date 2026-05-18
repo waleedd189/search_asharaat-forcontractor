@@ -172,6 +172,10 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
     </div>
     <div class="header-actions">
       <div class="rtime-top" id="rtEl"></div>
+      <button id="btn-install" onclick="triggerInstall()"
+        style="display:none;background:linear-gradient(135deg,#2563eb,#1d4ed8);border:none;border-radius:10px;padding:8px 16px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Cairo,inherit;display:flex;align-items:center;gap:6px">
+        📲 تثبيت التطبيق
+      </button>
     </div>
   </div>
 
@@ -236,16 +240,33 @@ var deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',function(e){
   e.preventDefault();
   deferredPrompt=e;
-  // اعرض الـ banner بعد ثانيتين
-  setTimeout(function(){
-    document.getElementById('installBanner').classList.add('show');
-  }, 2000);
+  // أظهر زرار التثبيت
+  var btn = document.getElementById('btn-install');
+  if(btn) btn.style.display='flex';
+  // أظهر الـ banner
+  var dismissed = localStorage.getItem('install-dismissed');
+  if(!dismissed || Date.now()-parseInt(dismissed) > 7*24*3600*1000){
+    setTimeout(function(){
+      document.getElementById('installBanner').classList.add('show');
+    }, 1500);
+  }
 });
 
 window.addEventListener('appinstalled',function(){
   document.getElementById('installBanner').classList.remove('show');
+  var btn = document.getElementById('btn-install');
+  if(btn) btn.style.display='none';
   showToast('✅ تم تثبيت التطبيق بنجاح!');
 });
+
+function triggerInstall(){
+  if(deferredPrompt){
+    doInstall();
+  } else {
+    // iOS or already installed
+    showToast('📲 افتح قائمة المتصفح واختر "إضافة للشاشة الرئيسية"');
+  }
+}
 
 function doInstall(){
   if(!deferredPrompt) return;
@@ -254,6 +275,8 @@ function doInstall(){
     if(r.outcome==='accepted'){
       showToast('🎉 جاري التثبيت...');
       document.getElementById('installBanner').classList.remove('show');
+      var btn = document.getElementById('btn-install');
+      if(btn) btn.style.display='none';
     }
     deferredPrompt=null;
   });
