@@ -4,639 +4,517 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لوحة الأدمن — نظام الإشارات</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-<!-- SheetJS for Excel export -->
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root {
-  --bg: #060b14;
-  --surface: #0d1520;
-  --surface2: #111e2e;
-  --surface3: #172133;
-  --border: #1a3050;
-  --accent: #0ea5e9;
-  --gold: #f59e0b;
-  --success: #10b981;
-  --danger: #ef4444;
-  --warn: #f59e0b;
-  --text: #e2e8f0;
-  --text-muted: #4a6580;
-  --r: 12px;
-  --shadow: 0 8px 32px rgba(0,0,0,.5);
+:root{
+  --bg:#060b14;--surf:#0d1520;--surf2:#111e2e;--surf3:#172133;
+  --border:#1a3050;--accent:#0ea5e9;--gold:#f59e0b;
+  --ok:#10b981;--err:#ef4444;--txt:#e2e8f0;--muted:#4a6580;--r:12px;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
 
-/* ── Login ── */
-#loginScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:500;}
-.login-box{
-  width:100%;max-width:380px;
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:20px;padding:36px 28px;text-align:center;
-  box-shadow:0 0 80px rgba(14,165,233,.08);
-}
-.login-icon{font-size:48px;margin-bottom:16px;}
-.login-title{font-size:24px;font-weight:900;color:#fff;margin-bottom:6px;}
-.login-sub{font-size:13px;color:var(--text-muted);margin-bottom:28px;}
-.login-input{
-  width:100%;padding:13px 16px;
-  background:var(--surface2);border:1.5px solid var(--border);
-  border-radius:10px;color:var(--text);
-  font-family:'Cairo',sans-serif;font-size:15px;
-  outline:none;text-align:center;letter-spacing:3px;
-  margin-bottom:14px;
-}
-.login-input:focus{border-color:var(--accent);}
-.btn-login{
-  width:100%;padding:13px;
-  background:linear-gradient(135deg,var(--accent),#0369a1);
-  color:#fff;border:none;border-radius:10px;
-  font-family:'Cairo',sans-serif;font-size:15px;font-weight:700;
-  cursor:pointer;transition:all .2s;
-}
-.btn-login:hover{filter:brightness(1.1);}
-.login-err{color:var(--danger);font-size:13px;margin-top:10px;display:none;}
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:500;padding:20px}
+.lbox{width:100%;max-width:360px;background:var(--surf);border:1px solid var(--border);border-radius:20px;padding:36px 28px;text-align:center}
+.lico{font-size:44px;margin-bottom:14px}
+.ltitle{font-size:22px;font-weight:900;color:#fff;margin-bottom:6px}
+.lsub{font-size:13px;color:var(--muted);margin-bottom:24px}
+.linput{width:100%;padding:12px;background:var(--surf2);border:1.5px solid var(--border);border-radius:10px;color:var(--txt);font-family:'Cairo',sans-serif;font-size:15px;outline:none;text-align:center;letter-spacing:3px;margin-bottom:12px}
+.linput:focus{border-color:var(--accent)}
+.lbtn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),#0369a1);color:#fff;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:700;cursor:pointer}
+.lerr{color:var(--err);font-size:13px;margin-top:10px;display:none}
 
-/* ── Layout ── */
-.sidebar{
-  width:240px;height:100vh;position:fixed;top:0;right:0;
-  background:var(--surface);border-left:1px solid var(--border);
-  display:flex;flex-direction:column;
-  padding:24px 0;
-}
-.logo{padding:0 20px 24px;border-bottom:1px solid var(--border);margin-bottom:12px;}
-.logo-title{font-size:18px;font-weight:900;color:#fff;display:flex;align-items:center;gap:8px;}
-.logo-sub{font-size:11px;color:var(--text-muted);margin-top:3px;}
-.nav-item{
-  display:flex;align-items:center;gap:10px;
-  padding:11px 20px;font-size:14px;font-weight:600;
-  color:var(--text-muted);cursor:pointer;transition:all .2s;
-  border-right:3px solid transparent;
-}
-.nav-item:hover{color:var(--text);background:var(--surface2);}
-.nav-item.active{color:var(--accent);border-right-color:var(--accent);background:rgba(14,165,233,.08);}
-.nav-item .ni{font-size:18px;}
-.sidebar-footer{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);font-size:12px;color:var(--text-muted);}
+/* LAYOUT */
+.sidebar{width:220px;height:100vh;position:fixed;top:0;right:0;background:var(--surf);border-left:1px solid var(--border);display:flex;flex-direction:column;padding:20px 0}
+.logo{padding:0 18px 20px;border-bottom:1px solid var(--border);margin-bottom:10px}
+.logo-t{font-size:17px;font-weight:900;color:#fff;display:flex;align-items:center;gap:8px}
+.logo-s{font-size:11px;color:var(--muted);margin-top:3px}
+.nav{display:flex;align-items:center;gap:9px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;border-right:3px solid transparent}
+.nav:hover{color:var(--txt);background:var(--surf2)}
+.nav.on{color:var(--accent);border-right-color:var(--accent);background:rgba(14,165,233,.08)}
+.nav-ico{font-size:17px}
+.sf{margin-top:auto;padding:14px 18px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)}
+.sf a{color:var(--accent);text-decoration:none}
 
-.main{margin-right:240px;padding:28px;min-height:100vh;}
-.page{display:none;}
-.page.active{display:block;}
+.main{margin-right:220px;padding:24px;min-height:100vh}
+.page{display:none}
+.page.on{display:block}
 
-/* ── Header bar ── */
-.page-header{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:24px;
-}
-.page-title{font-size:22px;font-weight:900;color:#fff;}
-.page-sub{font-size:13px;color:var(--text-muted);margin-top:3px;}
+/* PAGE HEADER */
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px}
+.ph-title{font-size:20px;font-weight:900;color:#fff}
+.ph-sub{font-size:12px;color:var(--muted);margin-top:2px}
 
-/* ── Stats ── */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:28px;}
-.stat-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:18px;position:relative;overflow:hidden;
-}
-.stat-card::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,var(--accent-bg,.08) 0%,transparent 100%);
-  opacity:.4;
-}
-.stat-num{font-size:28px;font-weight:900;color:#fff;position:relative;}
-.stat-label{font-size:12px;color:var(--text-muted);margin-top:4px;position:relative;}
-.stat-icon{position:absolute;top:14px;left:14px;font-size:22px;opacity:.6;}
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.stat{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:16px;position:relative;overflow:hidden}
+.stat-n{font-size:26px;font-weight:900;color:#fff}
+.stat-l{font-size:12px;color:var(--muted);margin-top:3px}
+.stat-i{position:absolute;top:12px;left:12px;font-size:20px;opacity:.5}
 
-/* ── Table ── */
-.table-wrap{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);overflow:hidden;
-}
-.table-toolbar{
-  display:flex;align-items:center;gap:10px;
-  padding:14px 16px;border-bottom:1px solid var(--border);
-  flex-wrap:wrap;
-}
-.search-bar{
-  flex:1;min-width:200px;padding:9px 14px;
-  background:var(--surface2);border:1.5px solid var(--border);
-  border-radius:8px;color:var(--text);
-  font-family:'Cairo',sans-serif;font-size:14px;outline:none;
-}
-.search-bar:focus{border-color:var(--accent);}
-.btn{
-  padding:9px 16px;border:none;border-radius:8px;
-  font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;
-  cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;
-}
-.btn-accent{background:var(--accent);color:#fff;}
-.btn-accent:hover{filter:brightness(1.1);}
-.btn-success{background:var(--success);color:#fff;}
-.btn-success:hover{filter:brightness(1.1);}
-.btn-danger{background:rgba(239,68,68,.15);color:var(--danger);border:1px solid rgba(239,68,68,.25);}
-.btn-danger:hover{background:rgba(239,68,68,.25);}
-.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
-.btn-ghost:hover{background:var(--surface3);}
+/* BUTTONS */
+.btn{padding:9px 14px;border:none;border-radius:8px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:5px}
+.btn-a{background:var(--accent);color:#fff}
+.btn-a:hover{filter:brightness(1.1)}
+.btn-g{background:var(--ok);color:#fff}
+.btn-g:hover{filter:brightness(1.1)}
+.btn-d{background:rgba(239,68,68,.12);color:var(--err);border:1px solid rgba(239,68,68,.2)}
+.btn-d:hover{background:rgba(239,68,68,.2)}
+.btn-gh{background:var(--surf2);color:var(--txt);border:1px solid var(--border)}
+.btn-gh:hover{background:var(--surf3)}
 
-table{width:100%;border-collapse:collapse;font-size:13px;}
-thead tr{background:var(--surface2);}
-th{padding:11px 14px;text-align:right;font-weight:700;color:var(--text-muted);font-size:12px;white-space:nowrap;}
-td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
-tr:hover td{background:var(--surface2);}
-tr:last-child td{border-bottom:none;}
-.badge-pill{
-  display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;
-}
-.badge-new{background:rgba(16,185,129,.15);color:var(--success);}
-.badge-old{background:rgba(14,165,233,.12);color:var(--accent);}
+/* TABLE */
+.tw{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.tb{display:flex;align-items:center;gap:9px;padding:12px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.srch{flex:1;min-width:180px;padding:8px 12px;background:var(--surf2);border:1.5px solid var(--border);border-radius:7px;color:var(--txt);font-family:'Cairo',sans-serif;font-size:13px;outline:none}
+.srch:focus{border-color:var(--accent)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead tr{background:var(--surf2)}
+th{padding:10px 12px;text-align:right;font-weight:700;color:var(--muted);font-size:11px;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,.02)}
+tr:last-child td{border:none}
+.pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.pill-g{background:rgba(16,185,129,.12);color:var(--ok)}
+.pill-b{background:rgba(14,165,233,.1);color:var(--accent)}
+.pill-r{background:rgba(239,68,68,.1);color:var(--err)}
+.pill-y{background:rgba(245,158,11,.1);color:var(--gold)}
 
-/* ── Contractors Manager ── */
-.add-form{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:20px;margin-bottom:20px;
-}
-.add-form .form-row{display:flex;gap:10px;flex-wrap:wrap;}
-.add-form input{
-  flex:1;min-width:180px;padding:11px 14px;
-  background:var(--surface2);border:1.5px solid var(--border);
-  border-radius:8px;color:var(--text);
-  font-family:'Cairo',sans-serif;font-size:14px;outline:none;
-}
-.add-form input:focus{border-color:var(--accent);}
+/* ADD FORM */
+.add-form{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:18px}
+.add-row{display:flex;gap:9px;flex-wrap:wrap}
+.add-row input{flex:1;min-width:160px;padding:10px 12px;background:var(--surf2);border:1.5px solid var(--border);border-radius:8px;color:var(--txt);font-family:'Cairo',sans-serif;font-size:13px;outline:none}
+.add-row input:focus{border-color:var(--accent)}
 
-/* ── Modal ── */
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.7);
-  z-index:300;display:none;align-items:center;justify-content:center;padding:20px;
-}
-.modal-overlay.show{display:flex;}
-.modal{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:16px;padding:24px;width:100%;max-width:500px;
-  box-shadow:var(--shadow);
-}
-.modal h3{font-size:18px;font-weight:900;margin-bottom:16px;color:#fff;}
-.modal img{width:100%;border-radius:10px;margin-bottom:8px;}
-.modal-close{
-  display:block;width:100%;margin-top:16px;padding:11px;
-  background:var(--surface2);border:1px solid var(--border);
-  color:var(--text);border-radius:8px;
-  font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;cursor:pointer;
-}
-.modal-photos{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.on{display:flex}
+.modal{background:var(--surf);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:480px}
+.modal h3{font-size:16px;font-weight:900;margin-bottom:14px;color:#fff}
+.modal-imgs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.modal-imgs img{width:100%;border-radius:8px;object-fit:cover}
+.modal-close{display:block;width:100%;margin-top:14px;padding:10px;background:var(--surf2);border:1px solid var(--border);color:var(--txt);border-radius:8px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
 
-/* ── Toast ── */
-.toast{
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
-  background:var(--surface);border:1px solid var(--border);border-radius:10px;
-  padding:12px 20px;font-size:14px;font-weight:600;
-  box-shadow:var(--shadow);z-index:900;transition:transform .3s;white-space:nowrap;
-}
-.toast.show{transform:translateX(-50%) translateY(0);}
-.toast.success{border-right:3px solid var(--success);}
-.toast.error{border-right:3px solid var(--danger);}
-.toast.info{border-right:3px solid var(--accent);}
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:11px 18px;font-size:13px;font-weight:600;box-shadow:0 4px 24px rgba(0,0,0,.4);z-index:900;transition:transform .3s;white-space:nowrap}
+.toast.on{transform:translateX(-50%) translateY(0)}
+.toast.ok{border-right:3px solid var(--ok)}
+.toast.err{border-right:3px solid var(--err)}
+.toast.info{border-right:3px solid var(--accent)}
 
-/* Loading */
-.loading-row td{text-align:center;padding:30px;color:var(--text-muted);}
-.spinner{
-  display:inline-block;width:20px;height:20px;
-  border:2px solid rgba(14,165,233,.2);border-top-color:var(--accent);
-  border-radius:50%;animation:spin .7s linear infinite;
-  vertical-align:middle;margin-left:8px;
-}
-@keyframes spin{to{transform:rotate(360deg);}}
+.spin{display:inline-block;width:18px;height:18px;border:2px solid rgba(14,165,233,.2);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-left:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.ldrow td{text-align:center;padding:24px;color:var(--muted)}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-ico{font-size:36px;margin-bottom:10px}
 
 @media(max-width:768px){
-  .sidebar{display:none;}
-  .main{margin-right:0;padding:16px;}
+  .sidebar{display:none}
+  .main{margin-right:0;padding:14px}
 }
 </style>
 </head>
 <body>
 
-<!-- ═══════ LOGIN ═══════ -->
+<!-- LOGIN -->
 <div id="loginScreen">
-  <div class="login-box">
-    <div class="login-icon">🔐</div>
-    <div class="login-title">لوحة الأدمن</div>
-    <div class="login-sub">نظام إشارات المقاولين</div>
-    <input class="login-input" type="password" id="adminPass"
-      placeholder="••••••••"
-      onkeydown="if(event.key==='Enter')checkAdminPass()">
-    <button class="btn-login" onclick="checkAdminPass()">دخول</button>
-    <div class="login-err" id="passErr">❌ كلمة المرور غير صحيحة</div>
+  <div class="lbox">
+    <div class="lico">🔐</div>
+    <div class="ltitle">لوحة الأدمن</div>
+    <div class="lsub">نظام إشارات المقاولين</div>
+    <input class="linput" type="password" id="pw" placeholder="••••••••"
+      onkeydown="if(event.key==='Enter')checkPw()">
+    <button class="lbtn" onclick="checkPw()">دخول</button>
+    <div class="lerr" id="pwErr">❌ كلمة المرور غير صحيحة</div>
   </div>
 </div>
 
-<!-- ═══════ SIDEBAR ═══════ -->
+<!-- SIDEBAR -->
 <div class="sidebar">
   <div class="logo">
-    <div class="logo-title">🚦 نظام الإشارات</div>
-    <div class="logo-sub">لوحة التحكم</div>
+    <div class="logo-t">🚦 نظام الإشارات</div>
+    <div class="logo-s">لوحة التحكم</div>
   </div>
-  <div class="nav-item active" onclick="showPage('dashboard',this)">
-    <span class="ni">📊</span> الرئيسية
-  </div>
-  <div class="nav-item" onclick="showPage('signals',this)">
-    <span class="ni">📋</span> الإشارات
-  </div>
-  <div class="nav-item" onclick="showPage('contractors',this)">
-    <span class="ni">👷</span> المقاولون
-  </div>
-  <div class="sidebar-footer">
+  <div class="nav on"  onclick="goPage('dash',this)"><span class="nav-ico">📊</span>الرئيسية</div>
+  <div class="nav"     onclick="goPage('sigs',this)"><span class="nav-ico">📋</span>الإشارات</div>
+  <div class="nav"     onclick="goPage('cons',this)"><span class="nav-ico">👷</span>المقاولون</div>
+  <div class="sf">
     نظام الإشارات v2.0<br>
-    <a href="index.html" style="color:var(--accent);text-decoration:none">← العودة للتطبيق</a>
+    <a href="index.html">← العودة للتطبيق</a>
   </div>
 </div>
 
-<!-- ═══════ MAIN ═══════ -->
+<!-- MAIN -->
 <div class="main">
 
   <!-- DASHBOARD -->
-  <div class="page active" id="page-dashboard">
-    <div class="page-header">
-      <div>
-        <div class="page-title">الرئيسية</div>
-        <div class="page-sub">نظرة عامة على النظام</div>
-      </div>
-      <button class="btn btn-accent" onclick="loadAll()">🔄 تحديث</button>
+  <div class="page on" id="pg-dash">
+    <div class="ph">
+      <div><div class="ph-title">الرئيسية</div><div class="ph-sub">نظرة عامة</div></div>
+      <button class="btn btn-a" onclick="loadAll()">🔄 تحديث</button>
     </div>
-    <div class="stats-grid" id="statsGrid">
-      <div class="stat-card"><div class="stat-num" id="statTotal">—</div><div class="stat-label">إجمالي الإشارات</div><div class="stat-icon">📋</div></div>
-      <div class="stat-card"><div class="stat-num" id="statToday">—</div><div class="stat-label">إشارات اليوم</div><div class="stat-icon">📅</div></div>
-      <div class="stat-card"><div class="stat-num" id="statContractors">—</div><div class="stat-label">المقاولون</div><div class="stat-icon">👷</div></div>
-      <div class="stat-card"><div class="stat-num" id="statWeek">—</div><div class="stat-label">إشارات هذا الأسبوع</div><div class="stat-icon">📈</div></div>
+    <div class="stats">
+      <div class="stat"><div class="stat-n" id="stTotal">—</div><div class="stat-l">إجمالي الإشارات</div><div class="stat-i">📋</div></div>
+      <div class="stat"><div class="stat-n" id="stToday">—</div><div class="stat-l">إشارات اليوم</div><div class="stat-i">📅</div></div>
+      <div class="stat"><div class="stat-n" id="stCons">—</div><div class="stat-l">المقاولون</div><div class="stat-i">👷</div></div>
+      <div class="stat"><div class="stat-n" id="stWeek">—</div><div class="stat-l">إشارات الأسبوع</div><div class="stat-i">📈</div></div>
     </div>
-    <div class="table-wrap">
-      <div class="table-toolbar">
-        <div style="font-weight:700;font-size:15px;">آخر الإشارات</div>
-      </div>
-      <div style="overflow-x:auto">
-        <table id="recentTable">
-          <thead><tr>
-            <th>#</th><th>الاسم</th><th>الرقم القومي</th><th>المقاول</th><th>التاريخ</th>
-          </tr></thead>
-          <tbody id="recentBody">
-            <tr class="loading-row"><td colspan="5"><div class="spinner"></div> جاري التحميل…</td></tr>
-          </tbody>
+    <div class="tw">
+      <div class="tb"><span style="font-weight:700;font-size:14px">⏱️ آخر الإشارات</span></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>#</th><th>الاسم</th><th>الرقم القومي</th><th>المقاول</th><th>التاريخ</th></tr></thead>
+          <tbody id="recentBody"><tr class="ldrow"><td colspan="5"><div class="spin"></div> جاري التحميل…</td></tr></tbody>
         </table>
       </div>
     </div>
   </div>
 
   <!-- SIGNALS -->
-  <div class="page" id="page-signals">
-    <div class="page-header">
-      <div>
-        <div class="page-title">جدول الإشارات</div>
-        <div class="page-sub" id="signalsCount">—</div>
-      </div>
+  <div class="page" id="pg-sigs">
+    <div class="ph">
+      <div><div class="ph-title">جدول الإشارات</div><div class="ph-sub" id="sigCount">—</div></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-success" onclick="exportExcel()">📥 تصدير Excel</button>
-        <button class="btn btn-accent" onclick="loadSignals()">🔄 تحديث</button>
+        <button class="btn btn-g" onclick="exportExcel()">📥 Excel</button>
+        <button class="btn btn-a" onclick="loadSignals()">🔄 تحديث</button>
       </div>
     </div>
-    <div class="table-wrap">
-      <div class="table-toolbar">
-        <input class="search-bar" id="signalSearch" placeholder="🔍 بحث بالاسم أو الرقم القومي أو المقاول…"
-          oninput="filterSignals()">
-        <select id="contractorFilter" class="search-bar" style="flex:0 0 180px" onchange="filterSignals()">
+    <div class="tw">
+      <div class="tb">
+        <input class="srch" id="sigSrch" placeholder="🔍 بحث بالاسم أو الرقم القومي…" oninput="filterSigs()">
+        <select class="srch" id="conFilter" style="flex:0 0 160px" onchange="filterSigs()">
           <option value="">كل المقاولين</option>
         </select>
       </div>
-      <div style="overflow-x:auto">
-        <table id="signalsTable">
+      <div class="tbl-wrap">
+        <table id="sigTable">
           <thead><tr>
             <th>#</th><th>الاسم</th><th>الرقم القومي</th><th>النوع</th>
             <th>القاطرة</th><th>انتهاء القاطرة</th>
             <th>المقطورة</th><th>انتهاء المقطورة</th>
             <th>المقاول</th><th>التاريخ</th><th>صور</th>
           </tr></thead>
-          <tbody id="signalsBody">
-            <tr class="loading-row"><td colspan="11"><div class="spinner"></div> جاري التحميل…</td></tr>
-          </tbody>
+          <tbody id="sigBody"><tr class="ldrow"><td colspan="11"><div class="spin"></div> جاري التحميل…</td></tr></tbody>
         </table>
       </div>
     </div>
   </div>
 
   <!-- CONTRACTORS -->
-  <div class="page" id="page-contractors">
-    <div class="page-header">
-      <div>
-        <div class="page-title">إدارة المقاولين</div>
-        <div class="page-sub">الإيميلات المسموح لها بالدخول</div>
-      </div>
-      <button class="btn btn-accent" onclick="loadContractors()">🔄 تحديث</button>
+  <div class="page" id="pg-cons">
+    <div class="ph">
+      <div><div class="ph-title">إدارة المقاولين</div><div class="ph-sub">الإيميلات المسموح لها بالدخول</div></div>
+      <button class="btn btn-a" onclick="loadContractors()">🔄 تحديث</button>
     </div>
     <div class="add-form">
-      <div style="font-weight:700;margin-bottom:14px;font-size:15px;">➕ إضافة مقاول جديد</div>
-      <div class="form-row">
+      <div style="font-weight:700;margin-bottom:12px;font-size:14px">➕ إضافة مقاول جديد</div>
+      <div class="add-row">
         <input type="text"  id="newName"  placeholder="اسم المقاول">
         <input type="email" id="newEmail" placeholder="الإيميل (gmail)">
-        <button class="btn btn-accent" onclick="addContractor()">إضافة</button>
+        <button class="btn btn-a" onclick="addContractor()">إضافة</button>
       </div>
     </div>
-    <div class="table-wrap">
-      <div style="overflow-x:auto">
+    <div class="tw">
+      <div class="tbl-wrap">
         <table>
-          <thead><tr><th>#</th><th>الاسم</th><th>الإيميل</th><th>إجمالي الإشارات</th><th>الحالة</th><th>إجراء</th></tr></thead>
-          <tbody id="contractorsBody">
-            <tr class="loading-row"><td colspan="6"><div class="spinner"></div> جاري التحميل…</td></tr>
-          </tbody>
+          <thead><tr><th>#</th><th>الاسم</th><th>الإيميل</th><th>عدد الإشارات</th><th>إجراء</th></tr></thead>
+          <tbody id="consBody"><tr class="ldrow"><td colspan="5"><div class="spin"></div> جاري التحميل…</td></tr></tbody>
         </table>
       </div>
     </div>
   </div>
 
-</div><!-- /main -->
+</div>
 
-<!-- ═══════ PHOTO MODAL ═══════ -->
-<div class="modal-overlay" id="photoModal">
+<!-- PHOTO MODAL -->
+<div class="modal-bg" id="photoModal">
   <div class="modal">
     <h3>📷 صور الإشارة</h3>
-    <div class="modal-photos" id="modalPhotos"></div>
+    <div class="modal-imgs" id="modalImgs"></div>
     <button class="modal-close" onclick="closeModal()">إغلاق</button>
   </div>
 </div>
 
-<!-- ═══════ TOAST ═══════ -->
+<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<script>
+<!-- Firebase -->
+<script type="module">
+import { initializeApp }   from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js';
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, serverTimestamp, Timestamp }
+                           from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
+
 // ══════════════════════════════════════
-//  CONFIG — نفس الإعدادات
+//  CONFIG
 // ══════════════════════════════════════
-const CFG = {
-  ADMIN_PASS: 'Admin@2025',   // ← غيّر هذا الباسورد
-  APPS_SCRIPT: 'https://script.google.com/macros/s/AKfycbwtCH2Ms0IcN0pq4HuHYwwaNB4e2QOdaAv-UvaZZraPCvU6FS7ba2MlXioUOBUs_HdQ/exec',
-  SAVE_SHEET: '1y0cBW8-qj_RlvZ-bHz3nhXhCm7GeWw9uRRZuVl4aB0I',
+const ADMIN_PASS = 'Admin@2025'; // ← غيّر هذا
+const FB = {
+  apiKey:            'AIzaSyCmLfaEb7lPCWaqiQLNRsqWUjuTya4xWF0',
+  authDomain:        'asharaat-search.firebaseapp.com',
+  projectId:         'asharaat-search',
+  storageBucket:     'asharaat-search.firebasestorage.app',
+  messagingSenderId: '930583092172',
+  appId:             '1:930583092172:web:89aaf88198c3b1d1195b69',
 };
 
-// ══════════════════════════════════════
-//  LOGIN
-// ══════════════════════════════════════
-function checkAdminPass() {
-  const val = document.getElementById('adminPass').value;
-  if (val === CFG.ADMIN_PASS) {
-    document.getElementById('loginScreen').style.display = 'none';
-    loadAll();
-  } else {
-    document.getElementById('passErr').style.display = 'block';
-    document.getElementById('adminPass').value = '';
-  }
-}
+const fbApp = initializeApp(FB);
+const db    = getFirestore(fbApp);
 
 // ══════════════════════════════════════
-//  NAVIGATION
-// ══════════════════════════════════════
-function showPage(name, el) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  if(el) el.classList.add('active');
-
-  if(name==='signals')     loadSignals();
-  if(name==='contractors') loadContractors();
-}
-
-// ══════════════════════════════════════
-//  DATA STORES
+//  STATE
 // ══════════════════════════════════════
 let allSignals     = [];
 let allContractors = [];
 
 // ══════════════════════════════════════
+//  LOGIN
+// ══════════════════════════════════════
+window.checkPw = function() {
+  if (document.getElementById('pw').value === ADMIN_PASS) {
+    document.getElementById('loginScreen').style.display = 'none';
+    loadAll();
+  } else {
+    document.getElementById('pwErr').style.display = 'block';
+    document.getElementById('pw').value = '';
+  }
+};
+
+// ══════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════
+window.goPage = function(name, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('on'));
+  document.getElementById('pg-'+name).classList.add('on');
+  if(el) el.classList.add('on');
+  if(name==='sigs') loadSignals();
+  if(name==='cons') loadContractors();
+};
+
+// ══════════════════════════════════════
 //  LOAD ALL
 // ══════════════════════════════════════
-async function loadAll() {
+window.loadAll = async function() {
   await Promise.all([loadSignals(), loadContractors()]);
   updateStats();
-}
+};
 
 // ══════════════════════════════════════
-//  SIGNALS
+//  SIGNALS — Firebase Firestore
 // ══════════════════════════════════════
-async function loadSignals() {
-  setLoading('signalsBody', 11);
+window.loadSignals = async function() {
+  setLoad('sigBody',11);
   try {
-    const data = await gasGet({action:'getAll'});
-    allSignals = data.rows || [];
-    renderSignals(allSignals);
-    renderRecent(allSignals.slice(-5).reverse());
-    populateContractorFilter();
-    document.getElementById('signalsCount').textContent = `${allSignals.length} إشارة مسجلة`;
+    const q    = query(collection(db,'signals'), orderBy('createdAt','desc'));
+    const snap = await getDocs(q);
+    allSignals = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    renderSigs(allSignals);
+    renderRecent(allSignals.slice(0,5));
+    fillConFilter();
+    document.getElementById('sigCount').textContent = allSignals.length + ' إشارة مسجلة';
+    updateStats();
   } catch(e) {
-    setError('signalsBody', 11, 'خطأ في التحميل: ' + e.message);
+    setErr('sigBody',11,'خطأ في التحميل: '+e.message);
   }
+};
+
+function renderSigs(rows) {
+  const b = document.getElementById('sigBody');
+  if (!rows.length) { b.innerHTML=`<tr class="ldrow"><td colspan="11"><div class="empty"><div class="empty-ico">📭</div>لا توجد إشارات بعد</div></td></tr>`; return; }
+  b.innerHTML = rows.map((r,i) => {
+    const dt = fmtDate(r.createdAt);
+    const trkExp = r.trk_exp || '';
+    const trlExp = r.trl_exp || '';
+    return `<tr>
+      <td style="color:var(--muted)">${i+1}</td>
+      <td style="font-weight:700">${r.name||'—'}</td>
+      <td style="font-family:monospace;letter-spacing:1px;font-size:11px">${r.nid||'—'}</td>
+      <td><span class="pill pill-b">${r.type||'—'}</span></td>
+      <td>${(r.trk_l||'')} ${(r.trk_n||'')}</td>
+      <td><span class="pill ${isExp(trkExp)?'pill-r':'pill-g'}">${trkExp||'—'}</span></td>
+      <td>${(r.trl_l||'')} ${(r.trl_n||'')}</td>
+      <td><span class="pill ${isExp(trlExp)?'pill-r':'pill-g'}">${trlExp||'—'}</span></td>
+      <td><span class="pill pill-y">${r.contractor||'—'}</span></td>
+      <td style="color:var(--muted);font-size:11px">${dt}</td>
+      <td>${(r.photo0||r.photo1)?`<button class="btn btn-gh" style="padding:5px 10px;font-size:11px" onclick='showPhotos("${r.photo0||''}","${r.photo1||''}")'>📷</button>`:'—'}</td>
+    </tr>`;
+  }).join('');
 }
 
-function renderSignals(rows) {
-  const tbody = document.getElementById('signalsBody');
-  if (!rows.length) {
-    tbody.innerHTML = `<tr class="loading-row"><td colspan="11">لا توجد بيانات</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = rows.map((r,i) => `
-    <tr>
-      <td>${r[0]||i+1}</td>
-      <td style="font-weight:700">${r[1]||'—'}</td>
-      <td style="font-family:monospace;letter-spacing:1px">${r[2]||'—'}</td>
-      <td><span class="badge-pill badge-new">${r[3]||'—'}</span></td>
-      <td>${(r[4]||'')+(r[5]?' '+r[5]:'')}</td>
-      <td style="color:${isExpired(r[6])?'var(--danger)':'var(--success)'}">${r[6]||'—'}</td>
-      <td>${(r[7]||'')+(r[8]?' '+r[8]:'')}</td>
-      <td style="color:${isExpired(r[9])?'var(--danger)':'var(--success)'}">${r[9]||'—'}</td>
-      <td>${r[10]||'—'}</td>
-      <td style="color:var(--text-muted);font-size:12px">${r[11]||'—'}</td>
-      <td>
-        ${r[12]?`<button class="btn btn-ghost" onclick='showPhotos(${JSON.stringify([r[12],r[13]])})'>📷 عرض</button>`:'—'}
-      </td>
-    </tr>`).join('');
-}
-
-function filterSignals() {
-  const q    = document.getElementById('signalSearch').value.toLowerCase();
-  const cont = document.getElementById('contractorFilter').value;
-  const filtered = allSignals.filter(r => {
-    const text = (r[1]||'')+(r[2]||'')+(r[10]||'');
-    const matchQ = !q || text.toLowerCase().includes(q);
-    const matchC = !cont || (r[10]||'') === cont;
-    return matchQ && matchC;
+window.filterSigs = function() {
+  const q = document.getElementById('sigSrch').value.toLowerCase();
+  const c = document.getElementById('conFilter').value;
+  const f = allSignals.filter(r=>{
+    const t=(r.name||'')+(r.nid||'')+(r.contractor||'');
+    return (!q||t.toLowerCase().includes(q))&&(!c||(r.contractor||'')===c);
   });
-  renderSignals(filtered);
-}
+  renderSigs(f);
+};
 
-function populateContractorFilter() {
-  const sel = document.getElementById('contractorFilter');
-  const contractors = [...new Set(allSignals.map(r=>r[10]).filter(Boolean))];
-  const current = sel.value;
-  sel.innerHTML = '<option value="">كل المقاولين</option>' +
-    contractors.map(c=>`<option value="${c}">${c}</option>`).join('');
-  sel.value = current;
-}
-
-function isExpired(dateStr) {
-  if (!dateStr) return false;
-  return new Date(dateStr) < new Date();
+function fillConFilter() {
+  const sel = document.getElementById('conFilter');
+  const cur = sel.value;
+  const uq  = [...new Set(allSignals.map(r=>r.contractor).filter(Boolean))];
+  sel.innerHTML = '<option value="">كل المقاولين</option>' + uq.map(c=>`<option value="${c}">${c}</option>`).join('');
+  sel.value = cur;
 }
 
 function renderRecent(rows) {
-  const tbody = document.getElementById('recentBody');
-  if (!rows.length) { tbody.innerHTML = `<tr class="loading-row"><td colspan="5">لا توجد بيانات</td></tr>`; return; }
-  tbody.innerHTML = rows.map((r,i)=>`
-    <tr>
-      <td>${i+1}</td>
-      <td style="font-weight:700">${r[1]||'—'}</td>
-      <td style="font-family:monospace">${r[2]||'—'}</td>
-      <td>${r[10]||'—'}</td>
-      <td style="color:var(--text-muted);font-size:12px">${r[11]||'—'}</td>
-    </tr>`).join('');
+  const b = document.getElementById('recentBody');
+  if(!rows.length){b.innerHTML=`<tr class="ldrow"><td colspan="5">لا توجد بيانات</td></tr>`;return;}
+  b.innerHTML = rows.map((r,i)=>`<tr>
+    <td>${i+1}</td>
+    <td style="font-weight:700">${r.name||'—'}</td>
+    <td style="font-family:monospace;font-size:11px">${r.nid||'—'}</td>
+    <td>${r.contractor||'—'}</td>
+    <td style="color:var(--muted);font-size:11px">${fmtDate(r.createdAt)}</td>
+  </tr>`).join('');
 }
 
 // ══════════════════════════════════════
 //  STATS
 // ══════════════════════════════════════
 function updateStats() {
-  const today = new Date().toISOString().split('T')[0];
-  const weekAgo = new Date(Date.now()-7*864e5).toISOString().split('T')[0];
-  document.getElementById('statTotal').textContent       = allSignals.length;
-  document.getElementById('statToday').textContent       = allSignals.filter(r=>(r[11]||'').startsWith(today)).length;
-  document.getElementById('statContractors').textContent = allContractors.length;
-  document.getElementById('statWeek').textContent        = allSignals.filter(r=>(r[11]||'')>=weekAgo).length;
+  const today   = new Date(); today.setHours(0,0,0,0);
+  const weekAgo = new Date(Date.now()-7*864e5);
+  const todayCount = allSignals.filter(r=>{
+    const d = r.createdAt?.toDate?.(); return d && d >= today;
+  }).length;
+  const weekCount = allSignals.filter(r=>{
+    const d = r.createdAt?.toDate?.(); return d && d >= weekAgo;
+  }).length;
+  document.getElementById('stTotal').textContent = allSignals.length;
+  document.getElementById('stToday').textContent = todayCount;
+  document.getElementById('stCons').textContent  = allContractors.length;
+  document.getElementById('stWeek').textContent  = weekCount;
 }
 
 // ══════════════════════════════════════
-//  CONTRACTORS
+//  CONTRACTORS — Firebase
 // ══════════════════════════════════════
-async function loadContractors() {
-  setLoading('contractorsBody', 6);
+window.loadContractors = async function() {
+  setLoad('consBody',5);
   try {
-    const data = await gasGet({action:'getContractors'});
-    allContractors = data.contractors || [];
-    renderContractors();
-  } catch(e) {
-    setError('contractorsBody', 6, 'خطأ في التحميل: ' + e.message);
-  }
-}
+    const snap = await getDocs(collection(db,'contractors'));
+    allContractors = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderCons();
+  } catch(e) { setErr('consBody',5,'خطأ: '+e.message); }
+};
 
-function renderContractors() {
-  const tbody = document.getElementById('contractorsBody');
-  if (!allContractors.length) {
-    tbody.innerHTML = `<tr class="loading-row"><td colspan="6">لا يوجد مقاولون</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = allContractors.map((c,i)=>{
-    const count = allSignals.filter(r=>(r[10]||'').trim()===c.name.trim()).length;
+function renderCons() {
+  const b = document.getElementById('consBody');
+  if(!allContractors.length){b.innerHTML=`<tr class="ldrow"><td colspan="5"><div class="empty"><div class="empty-ico">👷</div>لا يوجد مقاولون</div></td></tr>`;return;}
+  b.innerHTML = allContractors.map((c,i)=>{
+    const cnt = allSignals.filter(r=>r.contractor===c.name).length;
     return `<tr>
-      <td>${i+1}</td>
-      <td style="font-weight:700">${c.name}</td>
-      <td style="color:var(--text-muted);font-size:13px">${c.email}</td>
-      <td><span class="badge-pill badge-new">${count}</span></td>
-      <td><span class="badge-pill badge-new">✅ مفعّل</span></td>
-      <td>
-        <button class="btn btn-danger" onclick="deleteContractor('${c.email}','${c.name}')">
-          🗑 حذف
-        </button>
-      </td>
+      <td style="color:var(--muted)">${i+1}</td>
+      <td style="font-weight:700">${c.name||'—'}</td>
+      <td style="color:var(--muted);font-size:12px">${c.email||'—'}</td>
+      <td><span class="pill pill-g">${cnt}</span></td>
+      <td><button class="btn btn-d" onclick="delContractor('${c.id}','${c.name}')">🗑 حذف</button></td>
     </tr>`;
   }).join('');
 }
 
-async function addContractor() {
+window.addContractor = async function() {
   const name  = document.getElementById('newName').value.trim();
-  const email = document.getElementById('newEmail').value.trim();
-  if (!name || !email) { showToast('أدخل الاسم والإيميل', 'error'); return; }
-  if (!email.includes('@')) { showToast('إيميل غير صحيح', 'error'); return; }
+  const email = document.getElementById('newEmail').value.trim().toLowerCase();
+  if(!name||!email){showToast('أدخل الاسم والإيميل','err');return;}
+  if(!email.includes('@')){showToast('إيميل غير صحيح','err');return;}
+  if(allContractors.find(c=>c.email===email)){showToast('الإيميل موجود بالفعل','err');return;}
   try {
-    const data = await gasGet({action:'addContractor', name, email});
-    if (data.success) {
-      showToast('✅ تمت الإضافة', 'success');
-      document.getElementById('newName').value='';
-      document.getElementById('newEmail').value='';
-      loadContractors();
-    } else throw new Error(data.error || 'خطأ غير معروف');
-  } catch(e) { showToast('خطأ: '+e.message,'error'); }
-}
+    await addDoc(collection(db,'contractors'),{name,email,createdAt:serverTimestamp()});
+    showToast('✅ تمت الإضافة','ok');
+    document.getElementById('newName').value='';
+    document.getElementById('newEmail').value='';
+    await loadContractors();
+    updateStats();
+  } catch(e){showToast('خطأ: '+e.message,'err');}
+};
 
-async function deleteContractor(email, name) {
-  if (!confirm(`حذف المقاول: ${name}؟`)) return;
+window.delContractor = async function(id,name) {
+  if(!confirm(`حذف المقاول: ${name}؟`)) return;
   try {
-    const data = await gasGet({action:'deleteContractor', email});
-    if (data.success) {
-      showToast('تم الحذف', 'info');
-      loadContractors();
-    } else throw new Error(data.error || 'خطأ غير معروف');
-  } catch(e) { showToast('خطأ: '+e.message,'error'); }
-}
+    await deleteDoc(doc(db,'contractors',id));
+    showToast('تم الحذف','info');
+    await loadContractors();
+    updateStats();
+  } catch(e){showToast('خطأ: '+e.message,'err');}
+};
 
 // ══════════════════════════════════════
 //  EXPORT EXCEL
 // ══════════════════════════════════════
-function exportExcel() {
-  if (!allSignals.length) { showToast('لا توجد بيانات', 'error'); return; }
-  const headers = ['No','الاسم','الرقم القومي','النوع','القاطرة حروف','القاطرة أرقام',
-    'انتهاء القاطرة','المقطورة حروف','المقطورة أرقام','انتهاء المقطورة','المقاول','التاريخ'];
-  const ws = XLSX.utils.aoa_to_sheet([headers, ...allSignals.map(r=>r.slice(0,12))]);
-  // Column widths
-  ws['!cols'] = headers.map((_,i)=>({wch: i===1?25:i===2?18:14}));
+window.exportExcel = function() {
+  if(!allSignals.length){showToast('لا توجد بيانات','err');return;}
+  const hdrs = ['#','الاسم','الرقم القومي','النوع','القاطرة حروف','القاطرة أرقام',
+    'انتهاء القاطرة','المقطورة حروف','المقطورة أرقام','انتهاء المقطورة',
+    'المقاول','التاريخ','صورة أمامية','صورة خلفية'];
+  const rows = allSignals.map((r,i)=>[
+    i+1, r.name||'', r.nid||'', r.type||'',
+    r.trk_l||'', r.trk_n||'', r.trk_exp||'',
+    r.trl_l||'', r.trl_n||'', r.trl_exp||'',
+    r.contractor||'', fmtDate(r.createdAt),
+    r.photo0||'', r.photo1||'',
+  ]);
+  const ws = XLSX.utils.aoa_to_sheet([hdrs,...rows]);
+  ws['!cols'] = hdrs.map((_,i)=>({wch:i===1?22:i===2?18:i>=12?30:14}));
+  // تلوين الهيدر
+  const hRange = XLSX.utils.decode_range(ws['!ref']);
+  for(let C=hRange.s.c;C<=hRange.e.c;C++){
+    const addr = XLSX.utils.encode_cell({r:0,c:C});
+    if(!ws[addr]) continue;
+    ws[addr].s = {fill:{fgColor:{rgb:'0F172A'}},font:{color:{rgb:'38BDF8'},bold:true}};
+  }
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'الإشارات');
   const date = new Date().toISOString().split('T')[0];
   XLSX.writeFile(wb, `إشارات_${date}.xlsx`);
-  showToast('✅ تم تصدير Excel', 'success');
-}
+  showToast('✅ تم تصدير Excel','ok');
+};
 
 // ══════════════════════════════════════
-//  PHOTOS MODAL
+//  PHOTOS
 // ══════════════════════════════════════
-function showPhotos(urls) {
-  const el = document.getElementById('modalPhotos');
-  el.innerHTML = urls.filter(Boolean).map(u=>
-    u.startsWith('http')
-      ? `<img src="${u}" onerror="this.src=''" style="border-radius:8px;width:100%">`
-      : `<img src="${u}" style="border-radius:8px;width:100%">`
+window.showPhotos = function(p0,p1) {
+  const el = document.getElementById('modalImgs');
+  const imgs = [p0,p1].filter(Boolean).map(u=>
+    `<img src="${u}" onerror="this.style.display='none'" alt="صورة">`
   ).join('');
-  if(!el.innerHTML) el.innerHTML = '<p style="color:var(--text-muted)">لا توجد صور</p>';
-  document.getElementById('photoModal').classList.add('show');
-}
-function closeModal() {
-  document.getElementById('photoModal').classList.remove('show');
-}
-document.getElementById('photoModal').addEventListener('click', e=>{
-  if(e.target.id==='photoModal') closeModal();
-});
+  el.innerHTML = imgs || '<p style="color:var(--muted);grid-column:1/-1">لا توجد صور</p>';
+  document.getElementById('photoModal').classList.add('on');
+};
+window.closeModal = function() { document.getElementById('photoModal').classList.remove('on'); };
+document.getElementById('photoModal').addEventListener('click',e=>{if(e.target.id==='photoModal')closeModal();});
 
 // ══════════════════════════════════════
 //  HELPERS
 // ══════════════════════════════════════
-// ══════════════════════════════════════
-//  gasGet — كل الطلبات عبر GET لتفادي CORS
-//  Apps Script يعمل redirect، fetch يتبعه تلقائياً
-// ══════════════════════════════════════
-async function gasGet(params) {
-  const url = new URL(CFG.APPS_SCRIPT);
-  Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, v));
-  const res = await fetch(url.toString(), {
-    method: 'GET',
-    redirect: 'follow',
-  });
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  return await res.json();
+function fmtDate(ts) {
+  if(!ts) return '—';
+  const d = ts?.toDate?.() || (ts?.seconds ? new Date(ts.seconds*1000) : new Date(ts));
+  if(isNaN(d)) return '—';
+  return d.toLocaleDateString('ar-EG',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
 }
-
-function setLoading(tbodyId, cols) {
-  document.getElementById(tbodyId).innerHTML =
-    `<tr class="loading-row"><td colspan="${cols}"><div class="spinner"></div> جاري التحميل…</td></tr>`;
+function isExp(dateStr) {
+  if(!dateStr) return false;
+  return new Date(dateStr) < new Date();
 }
-function setError(tbodyId, cols, msg) {
-  document.getElementById(tbodyId).innerHTML =
-    `<tr class="loading-row"><td colspan="${cols}" style="color:var(--danger)">⚠️ ${msg}</td></tr>`;
+function setLoad(id,cols) {
+  document.getElementById(id).innerHTML=`<tr class="ldrow"><td colspan="${cols}"><div class="spin"></div> جاري التحميل…</td></tr>`;
 }
-function showToast(msg, type='info') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `toast show ${type}`;
-  setTimeout(()=>t.classList.remove('show'), 3500);
+function setErr(id,cols,msg) {
+  document.getElementById(id).innerHTML=`<tr class="ldrow"><td colspan="${cols}" style="color:var(--err)">⚠️ ${msg}</td></tr>`;
+}
+function showToast(msg,type='info') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast on '+type;
+  setTimeout(()=>t.classList.remove('on'),3500);
 }
 </script>
 </body>
