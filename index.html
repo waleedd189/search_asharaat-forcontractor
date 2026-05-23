@@ -1,470 +1,1013 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="theme-color" content="#2563eb">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="الاشارات">
+<title>نظام الإشارات</title>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<title>بحث الاشارات</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;direction:rtl;min-height:100vh}
-.wrap{padding:14px;max-width:640px;margin:0 auto;padding-bottom:120px}
+  :root {
+    --bg: #0a0f1e;
+    --surface: #111827;
+    --surface2: #1e2a3a;
+    --border: #1e3a5f;
+    --accent: #0ea5e9;
+    --accent2: #38bdf8;
+    --gold: #f59e0b;
+    --success: #10b981;
+    --danger: #ef4444;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --radius: 14px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
 
-/* ── HEADER ── */
-.header{background:#0f1829;border:1px solid #1e2d4a;border-radius:20px;padding:16px 18px;margin-bottom:14px}
-.header-top{display:flex;align-items:center;gap:12px}
-.app-title{font-size:20px;font-weight:900;color:#e2e8f0;line-height:1.1}
-.app-title span{color:#3b82f6}
-.app-sub{font-size:12px;color:#475569;margin-top:3px;font-weight:500}
-.header-actions{margin-top:12px;display:flex;align-items:center;justify-content:space-between}
-.rtime-top{font-size:11px;color:#334155;font-weight:500}
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-/* ── SEARCH ── */
-.search-box{position:relative;margin-bottom:10px}
-.search-box input{width:100%;padding:14px 48px 14px 14px;font-size:16px;font-family:'Cairo',inherit;font-weight:600;border:1.5px solid #1e2d4a;border-radius:14px;background:#0f1829;color:#ffffff;outline:none;direction:rtl;transition:border-color 0.2s}
-.search-box input:focus{border-color:#3b82f6;background:#111827}
-.search-box input::placeholder{color:#334155;font-weight:400}
-.sico{position:absolute;right:15px;top:50%;transform:translateY(-50%);color:#334155;pointer-events:none}
-.tab-row{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px}
-.tab-row::-webkit-scrollbar{display:none}
-.tab{padding:7px 16px;border-radius:20px;font-size:13px;font-weight:700;font-family:'Cairo',inherit;cursor:pointer;border:1px solid #1e2d4a;color:#64748b;background:#0f1829;white-space:nowrap;flex-shrink:0;transition:all 0.15s}
-.tab.on{background:#2563eb;color:#ffffff;border-color:#2563eb}
-.toprow{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-.stats{font-size:13px;color:#64748b;font-weight:600}
-.rbtn{font-size:13px;font-weight:700;color:#3b82f6;background:none;border:none;cursor:pointer;font-family:'Cairo',inherit;padding:4px 6px}
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
 
-/* ── RESULTS ── */
-.card{background:#0f1829;border:1px solid #1e2d4a;border-radius:18px;padding:14px 16px;margin-bottom:10px}
-.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #1a2535}
-.card-name{font-size:16px;font-weight:700;color:#ffffff;line-height:1.4}
-.card-id-small{font-size:11px;color:#475569;margin-top:3px;direction:ltr;text-align:right;letter-spacing:0.5px}
-.card-no{font-size:11px;color:#475569;background:#080c14;border-radius:7px;padding:3px 9px;font-weight:700;flex-shrink:0;margin-top:2px}
-.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#1a2535;border-radius:10px;overflow:hidden;margin-bottom:10px}
-.field{padding:6px 8px;background:#0f1829}
-.fl{font-size:12px;color:#94a3b8;font-weight:700;letter-spacing:0.5px;margin-bottom:3px}
-.fv{font-size:16px;color:#f8fafc;font-weight:600}
-.fv.empty{color:#334155;font-weight:400;font-size:13px}
-.fv.danger{color:#f87171;font-weight:700}
-.fv.warn{color:#fbbf24;font-weight:700}
-.fv.ok{color:#34d399;font-weight:600}
-.field.start-field{background:#0a1f12}
-.field.start-field .fl{color:#4ade80}
-.field.start-field .fv{color:#4ade80;font-size:18px;font-weight:900}
-.badge-row{display:flex;gap:6px;flex-wrap:wrap}
-.badge{font-size:11px;padding:4px 11px;border-radius:9px;font-weight:700}
-.bb{background:#0f2744;color:#60a5fa;border:1px solid #1e3a5f}
-.bg{background:#052e16;color:#4ade80;border:1px solid #14532d}
-.ba{background:#2c1500;color:#fb923c;border:1px solid #451a03}
-.br{background:#200a0a;color:#f87171;border:1px solid #450a0a}
+  /* ── Header ── */
+  .header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header-logo { display: flex; align-items: center; gap: 10px; }
+  .header-logo .icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--accent), #0369a1);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 0 16px rgba(14,165,233,0.4);
+  }
+  .header-title { font-size: 17px; font-weight: 700; color: #fff; }
+  .header-sub { font-size: 11px; color: var(--text-muted); }
+  .user-badge {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface2); border-radius: 20px;
+    padding: 6px 12px; font-size: 12px; cursor: pointer;
+    border: 1px solid var(--border);
+  }
+  .user-badge img { width: 24px; height: 24px; border-radius: 50%; }
+  .user-badge.hidden { display: none; }
 
-/* ── INSTALL BANNER ── */
-.install-banner{
-  background:linear-gradient(135deg,#1e3a5f,#1e40af);
-  border:1px solid #3b82f6;border-radius:16px;
-  padding:16px;margin-bottom:14px;
-  display:none;animation:slideDown .4s ease
-}
-.install-banner.show{display:block}
-@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-.install-banner-title{font-size:15px;font-weight:900;color:white;margin-bottom:6px;display:flex;align-items:center;gap:8px}
-.install-banner-sub{font-size:12px;color:#93c5fd;margin-bottom:12px;line-height:1.6}
-.install-banner-btns{display:flex;gap:8px}
-.install-btn-main{flex:1;padding:10px;border:none;border-radius:10px;background:#2563eb;color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:'Cairo',inherit}
-.install-btn-close{padding:10px 14px;border:1px solid rgba(255,255,255,0.2);border-radius:10px;background:transparent;color:#93c5fd;font-size:12px;cursor:pointer;font-family:'Cairo',inherit}
+  /* ── Tabs ── */
+  .tabs {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 73px;
+    z-index: 99;
+  }
+  .tab-btn {
+    flex: 1; padding: 14px 8px;
+    background: none; border: none; color: var(--text-muted);
+    font-family: 'Cairo', sans-serif; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all .25s;
+    position: relative; display: flex; align-items: center;
+    justify-content: center; gap: 6px;
+  }
+  .tab-btn.active { color: var(--accent2); }
+  .tab-btn.active::after {
+    content: ''; position: absolute; bottom: 0; left: 10%; right: 10%;
+    height: 2px; background: var(--accent2); border-radius: 2px 2px 0 0;
+  }
 
-/* iOS instructions */
-.ios-instructions{
-  background:#0d2137;border:1px solid #1e3a5f;border-radius:12px;
-  padding:14px;margin-bottom:14px;display:none
-}
-.ios-instructions.show{display:block}
-.ios-step{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1a2535;font-size:13px;color:#e2e8f0}
-.ios-step:last-child{border:none}
-.ios-step-icon{font-size:20px;flex-shrink:0}
+  /* ── Content ── */
+  .content { flex: 1; overflow-y: auto; }
+  .tab-panel { display: none; padding: 20px 16px 100px; }
+  .tab-panel.active { display: block; }
 
-/* ── LOADING ── */
-.loading{text-align:center;padding:50px 20px;color:#475569;font-size:14px;font-weight:600}
-.spinner{display:inline-block;width:32px;height:32px;border:3px solid #1a2535;border-top-color:#3b82f6;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:14px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.empty{text-align:center;padding:40px 20px;color:#1e2d4a;font-size:14px;font-weight:700}
-.err-box{background:#160a0a;border:1px solid #7f1d1d;border-radius:14px;padding:16px;margin:10px 0;color:#fca5a5;font-size:14px;line-height:1.9;font-weight:500}
-.err-box code{font-size:10px;direction:ltr;display:block;margin-top:8px;word-break:break-all;color:#475569}
-.rbtn2{margin-top:14px;padding:11px 26px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Cairo',inherit}
+  /* ── Login Gate ── */
+  #loginGate {
+    position: fixed; inset: 0; z-index: 200;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .login-card {
+    width: 100%; max-width: 360px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px 24px;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(14,165,233,0.1);
+  }
+  .login-logo {
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg, var(--accent), #0369a1);
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px; margin: 0 auto 20px;
+    box-shadow: 0 0 30px rgba(14,165,233,0.35);
+  }
+  .login-title { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 6px; }
+  .login-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.6; }
+  .btn-google {
+    width: 100%; padding: 14px;
+    background: #fff; color: #1f2937;
+    border: none; border-radius: 12px;
+    font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: all .2s;
+  }
+  .btn-google:hover { background: #f8fafc; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+  .btn-google svg { width: 20px; height: 20px; flex-shrink: 0; }
+  .login-note { font-size: 11px; color: var(--text-muted); margin-top: 16px; }
+  .login-error { color: var(--danger); font-size: 13px; margin-top: 12px; display: none; }
 
-/* ── FOOTER ── */
-.footer{text-align:center;padding:24px 10px 8px;border-top:1px solid #111827;margin-top:24px}
-.footer-label{font-size:12px;color:#334155;margin-bottom:12px;font-weight:700;letter-spacing:1px}
-.quran-link{display:inline-flex;align-items:center;gap:12px;background:#061a0d;border:1px solid #14532d;border-radius:16px;padding:13px 20px;text-decoration:none;transition:all 0.2s;width:100%}
-.quran-link:active{background:#0d2414;border-color:#16a34a}
-.quran-title{font-size:16px;font-weight:900;color:#4ade80;display:block;line-height:1.3;font-family:'Cairo',inherit}
-.quran-sub{font-size:11px;color:#166534;display:block;margin-top:3px;font-weight:500}
+  /* ── Cards & Sections ── */
+  .section-title {
+    font-size: 13px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: .5px;
+    margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+  }
 
-/* ── TOAST ── */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;border-radius:12px;padding:11px 22px;font-size:14px;font-weight:700;z-index:999;transition:transform 0.3s ease;white-space:nowrap;pointer-events:none;font-family:'Cairo',inherit}
-.toast.show{transform:translateX(-50%) translateY(0)}
+  /* ── Search Tab ── */
+  .search-wrap { position: relative; margin-bottom: 20px; }
+  .search-input {
+    width: 100%; padding: 14px 48px 14px 16px;
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 12px; color: var(--text);
+    font-family: 'Cairo', sans-serif; font-size: 15px;
+    outline: none; transition: border-color .2s;
+    direction: ltr; letter-spacing: 1px;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text-muted); direction: rtl; letter-spacing: 0; }
+  .search-icon {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); font-size: 18px; pointer-events: none;
+  }
+  .btn-primary {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, var(--accent) 0%, #0369a1 100%);
+    color: #fff; border: none; border-radius: 12px;
+    font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all .2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+  /* Result card */
+  .result-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 20px;
+    border: 1px solid var(--border);
+    animation: slideUp .3s ease;
+  }
+  @keyframes slideUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+  .result-header {
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .result-header.found { background: rgba(16,185,129,.15); border-bottom: 1px solid rgba(16,185,129,.2); }
+  .result-header.not-found { background: rgba(239,68,68,.12); border-bottom: 1px solid rgba(239,68,68,.2); }
+  .result-header .badge {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+  }
+  .found .badge { background: rgba(16,185,129,.25); }
+  .not-found .badge { background: rgba(239,68,68,.2); }
+  .result-label { font-size: 13px; font-weight: 700; }
+  .found .result-label { color: var(--success); }
+  .not-found .result-label { color: var(--danger); }
+  .result-body { padding: 16px; }
+  .info-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,.05); font-size: 14px; }
+  .info-row:last-child { border-bottom: none; }
+  .info-row .lbl { color: var(--text-muted); }
+  .info-row .val { font-weight: 700; color: var(--text); }
+
+  /* ── Register Tab ── */
+  .steps-bar {
+    display: flex; gap: 6px; margin-bottom: 20px;
+  }
+  .step-seg {
+    flex: 1; height: 4px; border-radius: 2px;
+    background: var(--border); transition: background .3s;
+  }
+  .step-seg.done { background: var(--success); }
+  .step-seg.active { background: var(--accent); }
+
+  .step-panel { display: none; }
+  .step-panel.active { display: block; }
+
+  /* Camera / Photo */
+  .photo-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .photo-slot {
+    aspect-ratio: 3/2;
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    cursor: pointer; transition: all .2s; position: relative; overflow: hidden;
+    background: var(--surface2);
+  }
+  .photo-slot:hover { border-color: var(--accent); }
+  .photo-slot.captured { border-style: solid; border-color: var(--success); }
+  .photo-slot img {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  }
+  .photo-slot .slot-label {
+    font-size: 11px; color: var(--text-muted); margin-top: 6px; text-align: center;
+    padding: 0 8px; position: relative; z-index: 1;
+  }
+  .photo-slot .slot-icon { font-size: 26px; position: relative; z-index: 1; }
+  .photo-slot .slot-check {
+    position: absolute; top: 6px; right: 6px;
+    background: var(--success); color: #fff;
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 12px;
+    z-index: 2;
+  }
+  input[type="file"] { display: none; }
+
+  /* AI Extract */
+  .ai-extract-box {
+    background: linear-gradient(135deg, rgba(14,165,233,.08), rgba(3,105,161,.08));
+    border: 1px solid rgba(14,165,233,.25);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .ai-status {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 14px; font-weight: 600;
+  }
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid rgba(14,165,233,.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Form fields */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-grid .full { grid-column: 1 / -1; }
+  .field label {
+    display: block; font-size: 11px; font-weight: 700;
+    color: var(--text-muted); margin-bottom: 6px;
+    text-transform: uppercase; letter-spacing: .3px;
+  }
+  .field input, .field select {
+    width: 100%; padding: 11px 13px;
+    background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: 10px; color: var(--text);
+    font-family: 'Cairo', sans-serif; font-size: 14px;
+    outline: none; transition: border-color .2s;
+  }
+  .field input:focus, .field select:focus { border-color: var(--accent); }
+  .field input.auto-filled { border-color: var(--success); background: rgba(16,185,129,.06); }
+  .field select option { background: var(--surface); }
+
+  /* Bottom bar */
+  .action-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    padding: 12px 16px 20px;
+    background: linear-gradient(to top, var(--bg) 60%, transparent);
+    z-index: 50;
+    display: flex; gap: 10px;
+  }
+  .btn-secondary {
+    padding: 13px 20px;
+    background: var(--surface2); border: 1.5px solid var(--border);
+    color: var(--text); border-radius: 12px;
+    font-family: 'Cairo', sans-serif; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all .2s;
+  }
+  .btn-secondary:hover { background: var(--surface); }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 90px; left: 16px; right: 16px;
+    background: var(--surface); border-radius: 12px;
+    padding: 14px 16px; font-size: 14px; font-weight: 600;
+    border-right: 4px solid var(--accent);
+    box-shadow: var(--shadow);
+    transform: translateY(120%); transition: transform .3s;
+    z-index: 300;
+  }
+  .toast.show { transform: none; }
+  .toast.success { border-right-color: var(--success); }
+  .toast.error { border-right-color: var(--danger); }
+
+  /* Duplicate warning */
+  .dup-warning {
+    background: rgba(245,158,11,.1);
+    border: 1px solid rgba(245,158,11,.3);
+    border-radius: 12px; padding: 14px; margin-bottom: 14px;
+    display: none;
+  }
+  .dup-warning .dup-title { font-weight: 700; color: var(--gold); font-size: 14px; margin-bottom: 6px; }
+  .dup-warning .dup-info { font-size: 13px; color: var(--text); line-height: 1.7; }
+
+  /* ── Utility ── */
+  .mt12 { margin-top: 12px; }
+  .mt20 { margin-top: 20px; }
+  .text-center { text-align: center; }
+  .loader-overlay {
+    position: fixed; inset: 0; background: rgba(10,15,30,.7);
+    z-index: 400; display: none;
+    align-items: center; justify-content: center;
+    flex-direction: column; gap: 14px;
+  }
+  .loader-overlay.show { display: flex; }
+  .loader-big {
+    width: 52px; height: 52px;
+    border: 3px solid rgba(14,165,233,.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  .loader-text { font-size: 14px; color: var(--text-muted); }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <!-- INSTALL BANNER - Android -->
-  <div class="install-banner" id="installBanner">
-    <div class="install-banner-title">📲 ثبّت التطبيق على هاتفك</div>
-    <div class="install-banner-sub">
-      ثبّت تطبيق بحث الاشارات على شاشتك الرئيسية للوصول السريع بدون متصفح — مجاناً وبدون متجر تطبيقات!
-    </div>
-    <div class="install-banner-btns">
-      <button class="install-btn-main" onclick="doInstall()">📥 تثبيت الآن</button>
-      <button class="install-btn-close" onclick="dismissInstall()">لاحقاً</button>
-    </div>
-  </div>
-
-  <!-- iOS INSTRUCTIONS -->
-  <div class="ios-instructions" id="iosInstructions">
-    <div style="font-size:14px;font-weight:800;color:white;margin-bottom:12px">📲 تثبيت التطبيق على iPhone / iPad</div>
-    <div class="ios-step">
-      <span class="ios-step-icon">1️⃣</span>
-      <span>اضغط زرار <strong style="color:#3b82f6">مشاركة</strong> في الأسفل (الزرار بالسهم للأعلى)</span>
-    </div>
-    <div class="ios-step">
-      <span class="ios-step-icon">2️⃣</span>
-      <span>اختار <strong style="color:#3b82f6">"إضافة إلى الشاشة الرئيسية"</strong></span>
-    </div>
-    <div class="ios-step">
-      <span class="ios-step-icon">3️⃣</span>
-      <span>اضغط <strong style="color:#4ade80">إضافة</strong> — وخلاص! 🎉</span>
-    </div>
-    <button onclick="document.getElementById('iosInstructions').classList.remove('show')"
-      style="margin-top:10px;width:100%;padding:8px;border:1px solid #1e3a5f;border-radius:8px;background:transparent;color:#64748b;font-size:12px;cursor:pointer;font-family:'Cairo',inherit">
-      إخفاء
+<!-- ═══════════════════════════════ LOGIN GATE ═══════════════════════ -->
+<div id="loginGate">
+  <div class="login-card">
+    <div class="login-logo">🚦</div>
+    <div class="login-title">نظام الإشارات</div>
+    <div class="login-sub">منصة تسجيل ومتابعة إشارات المقاولين</div>
+    <button class="btn-google" onclick="doGoogleLogin()">
+      <svg viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      تسجيل الدخول بـ Google
     </button>
-  </div>
-
-  <!-- HEADER -->
-  <div class="header">
-    <div class="header-top">
-      <svg width="50" height="50" viewBox="0 0 52 52" fill="none">
-        <rect width="52" height="52" rx="14" fill="#0f2744"/>
-        <rect x="6" y="20" width="28" height="16" rx="3" fill="#2563eb"/>
-        <rect x="30" y="23" width="14" height="13" rx="3" fill="#3b82f6"/>
-        <rect x="32" y="25" width="9" height="6" rx="1.5" fill="#bfdbfe" opacity="0.9"/>
-        <circle cx="12" cy="37" r="4" fill="#1e2d4a" stroke="#60a5fa" stroke-width="1.5"/>
-        <circle cx="12" cy="37" r="1.5" fill="#60a5fa"/>
-        <circle cx="24" cy="37" r="4" fill="#1e2d4a" stroke="#60a5fa" stroke-width="1.5"/>
-        <circle cx="24" cy="37" r="1.5" fill="#60a5fa"/>
-        <circle cx="39" cy="37" r="4" fill="#1e2d4a" stroke="#60a5fa" stroke-width="1.5"/>
-        <circle cx="39" cy="37" r="1.5" fill="#60a5fa"/>
-        <rect x="9" y="23" width="12" height="8" rx="1.5" fill="#1e3a5f" stroke="#3b82f6" stroke-width="0.8"/>
-        <rect x="10.5" y="24.5" width="9" height="1.5" rx="0.5" fill="#93c5fd" opacity="0.7"/>
-        <rect x="10.5" y="27" width="6" height="1.5" rx="0.5" fill="#93c5fd" opacity="0.4"/>
-      </svg>
-      <div>
-        <div class="app-title">بحث <span>الاشارات</span></div>
-        <div class="app-sub">تصاريح النقل الثقيل</div>
-      </div>
-    </div>
-    <div class="header-actions">
-      <div class="rtime-top" id="rtEl"></div>
-      <button id="btn-install" onclick="triggerInstall()"
-        style="display:none;background:linear-gradient(135deg,#2563eb,#1d4ed8);border:none;border-radius:10px;padding:8px 16px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Cairo,inherit;display:flex;align-items:center;gap:6px">
-        📲 تثبيت التطبيق
-      </button>
-    </div>
-  </div>
-
-  <!-- SEARCH -->
-  <div class="search-box">
-    <span class="sico">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <circle cx="9" cy="9" r="6" stroke="#475569" stroke-width="1.8"/>
-        <line x1="13.5" y1="13.5" x2="17" y2="17" stroke="#475569" stroke-width="1.8" stroke-linecap="round"/>
-      </svg>
-    </span>
-    <input type="search" id="qInput" placeholder="ابحث بالاسم أو الرقم القومي أو اللوحة..." autocomplete="off"/>
-  </div>
-  <div class="tab-row">
-    <div class="tab on" id="t0" onclick="setField('all',0)">الكل</div>
-    <div class="tab" id="t1" onclick="setField('name',1)">الاسم</div>
-    <div class="tab" id="t2" onclick="setField('id',2)">رقم قومي</div>
-    <div class="tab" id="t3" onclick="setField('plate',3)">اللوحة</div>
-  </div>
-  <div class="toprow">
-    <div class="stats" id="stEl">جاري التحميل...</div>
-    <button class="rbtn" onclick="loadData()">&#8635; تحديث</button>
-  </div>
-
-  <div id="loadArea" class="loading">
-    <div class="spinner"></div><br>جاري تحميل البيانات...
-  </div>
-  <div id="resEl"></div>
-
-  <!-- FOOTER -->
-  <div class="footer">
-    <div class="footer-label">✦ صـدقـة جـاريـة ✦</div>
-    <a class="quran-link" href="https://waleedd189.github.io/radio-quran/" target="_blank">
-      <svg width="42" height="42" viewBox="0 0 42 42" fill="none">
-        <rect width="42" height="42" rx="11" fill="#052e16"/>
-        <rect x="5" y="11" width="15" height="20" rx="2" fill="#14532d" stroke="#16a34a" stroke-width="0.8"/>
-        <rect x="22" y="11" width="15" height="20" rx="2" fill="#14532d" stroke="#16a34a" stroke-width="0.8"/>
-        <rect x="19" y="10" width="4" height="22" rx="1.5" fill="#021a07" stroke="#16a34a" stroke-width="0.5"/>
-        <rect x="7.5" y="15" width="10" height="1.2" rx="0.6" fill="#4ade80" opacity="0.6"/>
-        <rect x="7.5" y="18" width="7" height="1.2" rx="0.6" fill="#4ade80" opacity="0.4"/>
-        <rect x="24.5" y="15" width="10" height="1.2" rx="0.6" fill="#4ade80" opacity="0.6"/>
-        <rect x="24.5" y="18" width="7" height="1.2" rx="0.6" fill="#4ade80" opacity="0.4"/>
-        <path d="M14 8Q21 5 28 8" stroke="#4ade80" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.6"/>
-      </svg>
-      <div>
-        <span class="quran-title">﴿ راديو قرآن ﴾</span>
-        <span class="quran-sub">صفحة اللهم لك الحمد — اضغط للاستماع</span>
-      </div>
-    </a>
+    <div class="login-error" id="loginError">⚠️ غير مصرح لك بالدخول. تواصل مع الأدمن.</div>
+    <div class="login-note">الدخول مقصور على المقاولين المسموح لهم فقط</div>
   </div>
 </div>
 
+<!-- ═══════════════════════════════ HEADER ══════════════════════════ -->
+<div class="header">
+  <div class="header-logo">
+    <div class="icon">🚦</div>
+    <div>
+      <div class="header-title">نظام الإشارات</div>
+      <div class="header-sub" id="headerSub">تسجيل ومتابعة</div>
+    </div>
+  </div>
+  <div class="user-badge hidden" id="userBadge" onclick="confirmLogout()">
+    <span id="userName">مستخدم</span>
+    <span>↩</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ TABS ════════════════════════════ -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('search',this)">🔍 بحث</button>
+  <button class="tab-btn" onclick="switchTab('register',this)">📸 تسجيل إشارة</button>
+</div>
+
+<!-- ═══════════════════════════════ CONTENT ═════════════════════════ -->
+<div class="content">
+
+  <!-- ─── SEARCH TAB ─── -->
+  <div class="tab-panel active" id="panel-search">
+    <div class="section-title">🔍 البحث بالرقم القومي</div>
+
+    <div class="search-wrap">
+      <input class="search-input" id="searchInput" type="tel"
+        placeholder="أدخل الرقم القومي (14 رقم)"
+        maxlength="14" inputmode="numeric"
+        oninput="this.value=this.value.replace(/\D/g,'')">
+      <span class="search-icon">🪪</span>
+    </div>
+
+    <button class="btn-primary" onclick="doSearch()" id="searchBtn">
+      <span>بحث</span>
+    </button>
+
+    <div id="searchResult"></div>
+  </div>
+
+  <!-- ─── REGISTER TAB ─── -->
+  <div class="tab-panel" id="panel-register">
+
+    <!-- Steps bar -->
+    <div class="steps-bar">
+      <div class="step-seg active" id="seg0"></div>
+      <div class="step-seg" id="seg1"></div>
+      <div class="step-seg" id="seg2"></div>
+    </div>
+
+    <!-- Step 0: Photos -->
+    <div class="step-panel active" id="step0">
+      <div class="section-title">📸 تصوير الوثائق</div>
+      <div class="photo-slots">
+        <div class="photo-slot" id="slot0" onclick="triggerCamera(0)">
+          <span class="slot-icon">📷</span>
+          <div class="slot-label">وجه البطاقة / الرخصة (أمام)</div>
+          <input type="file" id="file0" accept="image/*" capture="environment" onchange="onPhoto(0,this)">
+        </div>
+        <div class="photo-slot" id="slot1" onclick="triggerCamera(1)">
+          <span class="slot-icon">📷</span>
+          <div class="slot-label">وجه البطاقة / الرخصة (خلف)</div>
+          <input type="file" id="file1" accept="image/*" capture="environment" onchange="onPhoto(1,this)">
+        </div>
+      </div>
+
+      <div class="ai-extract-box" id="aiBox" style="display:none">
+        <div class="ai-status" id="aiStatus">
+          <div class="spinner"></div>
+          <span>Claude يقرأ البيانات تلقائياً…</span>
+        </div>
+      </div>
+
+      <div class="dup-warning" id="dupWarning">
+        <div class="dup-title">⚠️ تحذير: رقم قومي موجود مسبقاً</div>
+        <div class="dup-info" id="dupInfo"></div>
+      </div>
+    </div>
+
+    <!-- Step 1: Data Form -->
+    <div class="step-panel" id="step1">
+      <div class="section-title">📋 مراجعة البيانات</div>
+      <div class="card">
+        <div class="form-grid">
+          <div class="field full">
+            <label>الاسم الكامل</label>
+            <input type="text" id="f_name" placeholder="اسم السائق">
+          </div>
+          <div class="field full">
+            <label>الرقم القومي</label>
+            <input type="tel" id="f_nid" placeholder="14 رقم" inputmode="numeric"
+              oninput="this.value=this.value.replace(/\D/g,'')" maxlength="14">
+          </div>
+          <div class="field full">
+            <label>النوع</label>
+            <select id="f_type">
+              <option value="">اختر النوع</option>
+              <option>بطاقة شخصية</option>
+              <option>رخصة قيادة</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>القاطرة - حروف</label>
+            <input type="text" id="f_trk_l" placeholder="أ ب ج" maxlength="5">
+          </div>
+          <div class="field">
+            <label>القاطرة - أرقام</label>
+            <input type="tel" id="f_trk_n" placeholder="12345" inputmode="numeric">
+          </div>
+          <div class="field full">
+            <label>انتهاء القاطرة</label>
+            <input type="date" id="f_trk_exp">
+          </div>
+          <div class="field">
+            <label>المقطورة - حروف</label>
+            <input type="text" id="f_trl_l" placeholder="أ ب ج" maxlength="5">
+          </div>
+          <div class="field">
+            <label>المقطورة - أرقام</label>
+            <input type="tel" id="f_trl_n" placeholder="12345" inputmode="numeric">
+          </div>
+          <div class="field full">
+            <label>انتهاء المقطورة</label>
+            <input type="date" id="f_trl_exp">
+          </div>
+          <div class="field full">
+            <label>المقاول</label>
+            <input type="text" id="f_contractor" readonly>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Confirm -->
+    <div class="step-panel" id="step2">
+      <div class="section-title">✅ تأكيد الحفظ</div>
+      <div class="card" id="summaryCard"></div>
+      <div class="card mt12" style="text-align:center; padding:20px;">
+        <div style="font-size:36px; margin-bottom:10px;">☁️</div>
+        <div style="font-size:13px; color:var(--text-muted); line-height:1.7;">
+          سيتم رفع الصور على Google Drive وحفظ البيانات في الشيت تلقائياً
+        </div>
+      </div>
+    </div>
+
+    <!-- Spacer for action bar -->
+    <div style="height:80px"></div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- ═══════════════════════════════ ACTION BAR ══════════════════════ -->
+<div class="action-bar" id="actionBar" style="display:none">
+  <button class="btn-secondary" id="backBtn" onclick="prevStep()">→ رجوع</button>
+  <button class="btn-primary" id="nextBtn" onclick="nextStep()" style="flex:1">التالي ←</button>
+</div>
+
+<!-- ═══════════════════════════════ LOADER ══════════════════════════ -->
+<div class="loader-overlay" id="loaderOverlay">
+  <div class="loader-big"></div>
+  <div class="loader-text" id="loaderText">جاري الحفظ…</div>
+</div>
+
+<!-- ═══════════════════════════════ TOAST ═══════════════════════════ -->
 <div class="toast" id="toast"></div>
 
+<!-- ═══════════════════════════════ SCRIPTS ════════════════════════ -->
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
 <script>
-var DATA=[], FIELD='all';
-var SHEET_ID='1jmUEQg3KeRrUe5weJqFaSMFEc9Ahb8SNSqk1n0iDRnc';
-var GID='477351139';
-var deferredPrompt=null;
+// ══════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════
+const CONFIG = {
+  CLIENT_ID:     '181519120891-lpce9uf7mhktv12345.apps.googleusercontent.com', // ← غيّر هذا
+  CLAUDE_KEY:    'sk-ant-api03-FrvgYG6G_REPLACE_ME',                             // ← غيّر هذا
+  APPS_SCRIPT:   'https://script.google.com/macros/s/AKfycbwtCH2Ms0IcN0pq4HuHYwwaNB4e2QOdaAv-UvaZZraPCvU6FS7ba2MlXioUOBUs_HdQ/exec',
+  SEARCH_SHEET:  '1jmUEQg3KeRrUe5weJqFaSMFEc9Ahb8SNSqk1n0iDRnc',
+  SAVE_SHEET:    '1y0cBW8-qj_RlvZ-bHz3nhXhCm7GeWw9uRRZuVl4aB0I',
+};
 
-// ── PWA ──────────────────────────────────────
-window.addEventListener('beforeinstallprompt',function(e){
-  e.preventDefault();
-  deferredPrompt=e;
-  // أظهر زرار التثبيت
-  var btn = document.getElementById('btn-install');
-  if(btn) btn.style.display='flex';
-  // أظهر الـ banner
-  var dismissed = localStorage.getItem('install-dismissed');
-  if(!dismissed || Date.now()-parseInt(dismissed) > 7*24*3600*1000){
-    setTimeout(function(){
-      document.getElementById('installBanner').classList.add('show');
-    }, 1500);
+// ══════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════
+let currentUser = null;  // { email, name, picture, contractorName }
+let currentStep = 0;
+let photoDataURLs = [null, null]; // base64 of two photos
+let extractedData = {};
+
+// ══════════════════════════════════════
+//  GOOGLE LOGIN
+// ══════════════════════════════════════
+function initGoogle() {
+  if (typeof google === 'undefined') { setTimeout(initGoogle, 500); return; }
+  google.accounts.id.initialize({
+    client_id: CONFIG.CLIENT_ID,
+    callback: handleCredential,
+    auto_select: false,
+  });
+}
+initGoogle();
+
+async function doGoogleLogin() {
+  if (typeof google === 'undefined') { showToast('خطأ في تحميل Google', 'error'); return; }
+  google.accounts.id.prompt();
+}
+
+async function handleCredential(response) {
+  try {
+    const payload = JSON.parse(atob(response.credential.split('.')[1]));
+    const email = payload.email;
+
+    // Check if email is allowed via Apps Script
+    const res = await fetch(`${CONFIG.APPS_SCRIPT}?action=checkUser&email=${encodeURIComponent(email)}`);
+    const data = await res.json();
+
+    if (!data.allowed) {
+      document.getElementById('loginError').style.display = 'block';
+      return;
+    }
+
+    currentUser = {
+      email,
+      name: payload.name,
+      picture: payload.picture,
+      contractorName: data.contractorName || payload.name,
+    };
+
+    // Set contractor name in form
+    document.getElementById('f_contractor').value = currentUser.contractorName;
+
+    // Hide login gate
+    document.getElementById('loginGate').style.display = 'none';
+    document.getElementById('userBadge').classList.remove('hidden');
+    document.getElementById('userName').textContent = currentUser.contractorName;
+
+  } catch (e) {
+    console.error(e);
+    showToast('خطأ في تسجيل الدخول', 'error');
   }
-});
+}
 
-window.addEventListener('appinstalled',function(){
-  document.getElementById('installBanner').classList.remove('show');
-  var btn = document.getElementById('btn-install');
-  if(btn) btn.style.display='none';
-  showToast('✅ تم تثبيت التطبيق بنجاح!');
-});
+function confirmLogout() {
+  if (confirm('تسجيل الخروج؟')) {
+    currentUser = null;
+    document.getElementById('loginGate').style.display = 'flex';
+    document.getElementById('userBadge').classList.add('hidden');
+    if (typeof google !== 'undefined') google.accounts.id.disableAutoSelect();
+  }
+}
 
-function triggerInstall(){
-  if(deferredPrompt){
-    doInstall();
+// ══════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+  if (name === 'register') {
+    document.getElementById('actionBar').style.display = 'flex';
+    updateStepUI();
   } else {
-    // iOS or already installed
-    showToast('📲 افتح قائمة المتصفح واختر "إضافة للشاشة الرئيسية"');
+    document.getElementById('actionBar').style.display = 'none';
   }
 }
 
-function doInstall(){
-  if(!deferredPrompt) return;
-  deferredPrompt.prompt();
-  deferredPrompt.userChoice.then(function(r){
-    if(r.outcome==='accepted'){
-      showToast('🎉 جاري التثبيت...');
-      document.getElementById('installBanner').classList.remove('show');
-      var btn = document.getElementById('btn-install');
-      if(btn) btn.style.display='none';
+// ══════════════════════════════════════
+//  SEARCH
+// ══════════════════════════════════════
+async function doSearch() {
+  const nid = document.getElementById('searchInput').value.trim();
+  if (nid.length !== 14) { showToast('أدخل رقم قومي صحيح (14 رقم)', 'error'); return; }
+
+  const btn = document.getElementById('searchBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="border-top-color:#fff"></div> جاري البحث…';
+
+  try {
+    const res = await fetch(`${CONFIG.APPS_SCRIPT}?action=search&nid=${nid}&sheet=${CONFIG.SEARCH_SHEET}`);
+    const data = await res.json();
+    renderSearchResult(nid, data);
+  } catch (e) {
+    showToast('خطأ في الاتصال، حاول مجدداً', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span>بحث</span>';
+  }
+}
+
+function renderSearchResult(nid, data) {
+  const el = document.getElementById('searchResult');
+  if (data.found) {
+    el.innerHTML = `
+      <div class="result-card">
+        <div class="result-header found">
+          <div class="badge">✅</div>
+          <div>
+            <div class="result-label">موجود في النظام</div>
+            <div style="font-size:12px;color:var(--text-muted)">رقم: ${nid}</div>
+          </div>
+        </div>
+        <div class="result-body">
+          <div class="info-row"><span class="lbl">الاسم</span><span class="val">${data.name||'—'}</span></div>
+          <div class="info-row"><span class="lbl">أول إشارة</span><span class="val">${data.firstDate||'—'}</span></div>
+          <div class="info-row"><span class="lbl">المقاول</span><span class="val">${data.contractor||'—'}</span></div>
+        </div>
+      </div>`;
+  } else {
+    el.innerHTML = `
+      <div class="result-card">
+        <div class="result-header not-found">
+          <div class="badge">❌</div>
+          <div>
+            <div class="result-label">غير موجود</div>
+            <div style="font-size:12px;color:var(--text-muted)">الرقم ${nid} لم يُسجَّل بعد</div>
+          </div>
+        </div>
+        <div class="result-body" style="text-align:center;padding:20px">
+          <button class="btn-primary" onclick="goRegisterWith('${nid}')">
+            📸 تسجيل إشارة جديدة
+          </button>
+        </div>
+      </div>`;
+  }
+}
+
+function goRegisterWith(nid) {
+  document.querySelector('.tab-btn:nth-child(2)').click();
+  document.getElementById('f_nid').value = nid;
+}
+
+// ══════════════════════════════════════
+//  PHOTO CAPTURE
+// ══════════════════════════════════════
+function triggerCamera(idx) {
+  document.getElementById('file' + idx).click();
+}
+
+function onPhoto(idx, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const dataURL = e.target.result;
+    photoDataURLs[idx] = dataURL;
+    // Show preview
+    const slot = document.getElementById('slot' + idx);
+    slot.classList.add('captured');
+    slot.innerHTML = `
+      <img src="${dataURL}" alt="photo">
+      <div class="slot-check">✓</div>`;
+    // If both photos taken → run AI extraction
+    if (photoDataURLs[0] && photoDataURLs[1]) {
+      runAiExtract();
     }
-    deferredPrompt=null;
-  });
+  };
+  reader.readAsDataURL(file);
 }
 
-function dismissInstall(){
-  document.getElementById('installBanner').classList.remove('show');
-  localStorage.setItem('install-dismissed', Date.now());
+// ══════════════════════════════════════
+//  CLAUDE AI EXTRACT
+// ══════════════════════════════════════
+async function runAiExtract() {
+  const box = document.getElementById('aiBox');
+  box.style.display = 'block';
+  setAiStatus('Claude يقرأ البيانات…', true);
+
+  try {
+    const img0 = photoDataURLs[0].split(',')[1];
+    const img1 = photoDataURLs[1].split(',')[1];
+    const mt0  = photoDataURLs[0].split(';')[0].split(':')[1];
+    const mt1  = photoDataURLs[1].split(';')[0].split(':')[1];
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': CONFIG.CLAUDE_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-calls': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-5',
+        max_tokens: 800,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mt0, data: img0 } },
+            { type: 'image', source: { type: 'base64', media_type: mt1, data: img1 } },
+            {
+              type: 'text',
+              text: `استخرج البيانات من هذه الوثيقة المصرية (بطاقة رقم قومي أو رخصة قيادة).
+أعد JSON فقط بهذه الحقول:
+{
+  "name": "الاسم الكامل",
+  "nid": "الرقم القومي 14 رقم",
+  "type": "بطاقة شخصية أو رخصة قيادة",
+  "trk_letters": "حروف لوحة القاطرة",
+  "trk_numbers": "أرقام لوحة القاطرة",
+  "trk_expiry": "YYYY-MM-DD انتهاء القاطرة",
+  "trl_letters": "حروف لوحة المقطورة",
+  "trl_numbers": "أرقام لوحة المقطورة",
+  "trl_expiry": "YYYY-MM-DD انتهاء المقطورة"
 }
-
-// ── iOS Detection ──────────────────────────
-var isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-var isStandalone = window.matchMedia('(display-mode: standalone)').matches
-  || window.navigator.standalone === true;
-var dismissed = localStorage.getItem('ios-install-dismissed');
-
-if(isIos && !isStandalone && !dismissed){
-  setTimeout(function(){
-    document.getElementById('iosInstructions').classList.add('show');
-  }, 2000);
-}
-
-// ── PWA Service Worker ────────────────────
-if('serviceWorker' in navigator){
-  window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js').catch(function(){});
-  });
-}
-
-// ── DATA ─────────────────────────────────────
-function loadData(){
-  document.getElementById('loadArea').style.display='block';
-  document.getElementById('loadArea').innerHTML='<div class="spinner"></div><br>جاري تحميل البيانات...';
-  document.getElementById('resEl').innerHTML='';
-  document.getElementById('stEl').textContent='جاري التحميل...';
-  var url='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/export?format=csv&gid='+GID;
-  fetch(url)
-    .then(function(r){if(!r.ok)throw 0; return r.text();})
-    .then(function(csv){
-      DATA=parseCSV(csv);
-      document.getElementById('loadArea').style.display='none';
-      document.getElementById('rtEl').textContent='آخر تحديث: '+new Date().toLocaleTimeString('ar-EG');
-      document.getElementById('stEl').textContent='تم تحميل '+DATA.length+' سجل — اكتب للبحث';
-    })
-    .catch(function(){
-      document.getElementById('loadArea').innerHTML=
-        '<div class="err-box">⚠ تعذر تحميل البيانات<br>'+
-        '<button class="rbtn2" onclick="loadData()">↻ إعادة المحاولة</button></div>';
+إذا لم يظهر حقل في الصورة اتركه فارغاً. لا تضف أي نص إضافي.`
+            }
+          ]
+        }]
+      })
     });
+
+    const json = await response.json();
+    const text = json.content[0].text.trim();
+    const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
+    extractedData = parsed;
+
+    // Fill form
+    fillField('f_name',      parsed.name);
+    fillField('f_nid',       parsed.nid);
+    fillField('f_type',      parsed.type, true);
+    fillField('f_trk_l',     parsed.trk_letters);
+    fillField('f_trk_n',     parsed.trk_numbers);
+    fillField('f_trk_exp',   parsed.trk_expiry);
+    fillField('f_trl_l',     parsed.trl_letters);
+    fillField('f_trl_n',     parsed.trl_numbers);
+    fillField('f_trl_exp',   parsed.trl_expiry);
+
+    setAiStatus('✅ تم استخراج البيانات بنجاح', false);
+
+    // Check duplicate in search sheet
+    if (parsed.nid && parsed.nid.length === 14) {
+      checkDuplicate(parsed.nid);
+    }
+
+  } catch (err) {
+    console.error(err);
+    setAiStatus('⚠️ لم يتمكن Claude من القراءة — أدخل البيانات يدوياً', false);
+  }
 }
 
-function parseCSV(text){
-  var lines=text.split('\n'),result=[],headerFound=false;
-  for(var i=0;i<lines.length;i++){
-    var c=splitLine(lines[i]);
-    if(!c||c.length<3)continue;
-    if(!headerFound){
-      if(c.join(' ').indexOf('\u0627\u0644\u0627\u0633\u0645')>=0||c.join(' ').indexOf('\u0628\u0637\u0627\u0642\u0629')>=0){headerFound=true;}
-      continue;
+function fillField(id, value, isSelect=false) {
+  if (!value) return;
+  const el = document.getElementById(id);
+  el.value = value;
+  el.classList.add('auto-filled');
+}
+
+function setAiStatus(msg, loading) {
+  const el = document.getElementById('aiStatus');
+  el.innerHTML = loading
+    ? `<div class="spinner"></div><span>${msg}</span>`
+    : `<span>${msg}</span>`;
+}
+
+async function checkDuplicate(nid) {
+  try {
+    const res = await fetch(`${CONFIG.APPS_SCRIPT}?action=search&nid=${nid}&sheet=${CONFIG.SEARCH_SHEET}`);
+    const data = await res.json();
+    if (data.found) {
+      const w = document.getElementById('dupWarning');
+      w.style.display = 'block';
+      document.getElementById('dupInfo').innerHTML =
+        `الاسم: <b>${data.name}</b><br>أول إشارة: <b>${data.firstDate}</b><br>المقاول: <b>${data.contractor}</b>`;
     }
-    while(c.length<16)c.push('');
-    var name=tr(c[1]),id=tr(c[2]);
-    if(!name&&!id)continue;
-    var n1=tr(c[5]),t1=tr(c[4]),n2=tr(c[8]),t2=tr(c[7]);
-    result.push({
-      no:tr(c[0]),name:name,id:id,
-      train1:t1,num1:n1,exp1:tr(c[6]),
-      train2:t2,num2:n2,exp2:tr(c[9]),
-      contractor:tr(c[10]),start:tr(c[11]),
-      end:tr(c[12]),remaining:tr(c[13]),
-      plate1:tr(c[14])||(n1&&t1?n1+' '+t1:''),
-      plate2:tr(c[15])||(n2&&t2?n2+' '+t2:'')
+  } catch(e){}
+}
+
+// ══════════════════════════════════════
+//  STEPS NAVIGATION
+// ══════════════════════════════════════
+function updateStepUI() {
+  [0,1,2].forEach(i => {
+    document.getElementById('step' + i).classList.toggle('active', i === currentStep);
+    const seg = document.getElementById('seg' + i);
+    seg.className = 'step-seg' + (i < currentStep ? ' done' : i === currentStep ? ' active' : '');
+  });
+  document.getElementById('backBtn').style.display = currentStep > 0 ? 'block' : 'none';
+  document.getElementById('nextBtn').textContent = currentStep < 2 ? 'التالي ←' : '💾 حفظ';
+}
+
+function nextStep() {
+  if (currentStep === 0) {
+    if (!photoDataURLs[0] || !photoDataURLs[1]) { showToast('يرجى تصوير الوجهين', 'error'); return; }
+    currentStep = 1;
+  } else if (currentStep === 1) {
+    if (!validateForm()) return;
+    buildSummary();
+    currentStep = 2;
+  } else if (currentStep === 2) {
+    doSave();
+    return;
+  }
+  updateStepUI();
+}
+
+function prevStep() {
+  if (currentStep > 0) { currentStep--; updateStepUI(); }
+}
+
+function validateForm() {
+  const required = [
+    { id:'f_name', label:'الاسم' },
+    { id:'f_nid',  label:'الرقم القومي' },
+    { id:'f_type', label:'النوع' },
+    { id:'f_trk_l', label:'حروف القاطرة' },
+    { id:'f_trk_n', label:'أرقام القاطرة' },
+  ];
+  for (const f of required) {
+    if (!document.getElementById(f.id).value.trim()) {
+      showToast(`يرجى إدخال: ${f.label}`, 'error');
+      return false;
+    }
+  }
+  if (document.getElementById('f_nid').value.length !== 14) {
+    showToast('الرقم القومي يجب أن يكون 14 رقم', 'error');
+    return false;
+  }
+  return true;
+}
+
+function buildSummary() {
+  const fields = [
+    ['الاسم',             'f_name'],
+    ['الرقم القومي',      'f_nid'],
+    ['النوع',             'f_type'],
+    ['القاطرة - حروف',   'f_trk_l'],
+    ['القاطرة - أرقام',  'f_trk_n'],
+    ['انتهاء القاطرة',   'f_trk_exp'],
+    ['المقطورة - حروف',  'f_trl_l'],
+    ['المقطورة - أرقام', 'f_trl_n'],
+    ['انتهاء المقطورة',  'f_trl_exp'],
+    ['المقاول',           'f_contractor'],
+  ];
+  const html = fields.map(([lbl, id]) => {
+    const val = document.getElementById(id).value || '—';
+    return `<div class="info-row"><span class="lbl">${lbl}</span><span class="val">${val}</span></div>`;
+  }).join('');
+  document.getElementById('summaryCard').innerHTML = html;
+}
+
+// ══════════════════════════════════════
+//  SAVE
+// ══════════════════════════════════════
+async function doSave() {
+  showLoader('جاري الرفع على Google Drive…');
+  try {
+    const payload = {
+      action: 'save',
+      sheet: CONFIG.SAVE_SHEET,
+      name:       document.getElementById('f_name').value,
+      nid:        document.getElementById('f_nid').value,
+      type:       document.getElementById('f_type').value,
+      trk_l:      document.getElementById('f_trk_l').value,
+      trk_n:      document.getElementById('f_trk_n').value,
+      trk_exp:    document.getElementById('f_trk_exp').value,
+      trl_l:      document.getElementById('f_trl_l').value,
+      trl_n:      document.getElementById('f_trl_n').value,
+      trl_exp:    document.getElementById('f_trl_exp').value,
+      contractor: document.getElementById('f_contractor').value,
+      photo0:     photoDataURLs[0],
+      photo1:     photoDataURLs[1],
+      userEmail:  currentUser?.email || '',
+    };
+
+    const res = await fetch(CONFIG.APPS_SCRIPT, {
+      method: 'POST',
+      body: JSON.stringify(payload),
     });
-  }
-  return result;
-}
+    const data = await res.json();
 
-function tr(s){return(s||'').trim().replace(/^"|"$/g,'');}
-function splitLine(l){
-  var r=[],c='',q=false;
-  for(var i=0;i<l.length;i++){
-    if(l[i]==='"'){q=!q;}
-    else if(l[i]===','&&!q){r.push(c);c='';}
-    else{c+=l[i];}
-  }
-  r.push(c);return r;
-}
-
-function getPermitStatus(remaining, endStr){
-  if(remaining && !isNaN(parseInt(remaining))){
-    var days=parseInt(remaining);
-    if(days<=0) return 'danger';
-    if(days<=30) return 'warn';
-    return 'ok';
-  }
-  if(endStr){
-    var p=endStr.replace(/\//g,'-').split('-');
-    var d;
-    if(p.length===3){
-      if(p[0].length===4)d=new Date(+p[0],+p[1]-1,+p[2]);
-      else d=new Date(+p[2],+p[1]-1,+p[0]);
+    if (data.success) {
+      hideLoader();
+      showToast('✅ تم الحفظ بنجاح!', 'success');
+      resetRegister();
+    } else {
+      throw new Error(data.error || 'Unknown error');
     }
-    if(d&&!isNaN(d.getTime())){
-      var diff=(d-Date.now())/864e5;
-      if(diff<=0) return 'danger';
-      if(diff<=30) return 'warn';
-      return 'ok';
-    }
+  } catch(e) {
+    hideLoader();
+    showToast('❌ خطأ في الحفظ: ' + e.message, 'error');
   }
-  return '';
 }
 
-function expClass(s){
-  if(!s)return'';
-  var p=s.replace(/\//g,'-').split('-');var d;
-  if(p.length===3){if(p[0].length===4)d=new Date(+p[0],+p[1]-1,+p[2]);else d=new Date(+p[2],+p[1]-1,+p[0]);}
-  if(!d||isNaN(d.getTime()))return'';
-  var diff=(d-Date.now())/864e5;
-  return diff<0?'danger':diff<60?'warn':'ok';
+function resetRegister() {
+  currentStep = 0;
+  photoDataURLs = [null, null];
+  extractedData = {};
+  ['slot0','slot1'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.classList.remove('captured');
+    el.innerHTML = `
+      <span class="slot-icon">📷</span>
+      <div class="slot-label">${i===0?'وجه أمامي':'وجه خلفي'}</div>
+      <input type="file" id="file${i}" accept="image/*" capture="environment" onchange="onPhoto(${i},this)">`;
+  });
+  ['f_name','f_nid','f_type','f_trk_l','f_trk_n','f_trk_exp','f_trl_l','f_trl_n','f_trl_exp'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = '';
+    el.classList.remove('auto-filled');
+  });
+  document.getElementById('aiBox').style.display = 'none';
+  document.getElementById('dupWarning').style.display = 'none';
+  updateStepUI();
 }
 
-function setField(f,idx){
-  FIELD=f;
-  for(var i=0;i<4;i++){var el=document.getElementById('t'+i);if(el)el.classList.toggle('on',i===idx);}
-  doSearch();
+// ══════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+function showLoader(msg='جاري المعالجة…') {
+  document.getElementById('loaderText').textContent = msg;
+  document.getElementById('loaderOverlay').classList.add('show');
+}
+function hideLoader() {
+  document.getElementById('loaderOverlay').classList.remove('show');
 }
 
-function doSearch(){
-  var q=document.getElementById('qInput').value.trim();
-  var stEl=document.getElementById('stEl'),resEl=document.getElementById('resEl');
-  if(q.length<2){
-    stEl.textContent=DATA.length?'تم تحميل '+DATA.length+' سجل — اكتب للبحث':'جاري التحميل...';
-    resEl.innerHTML=''; return;
-  }
-  var hits=[];
-  for(var i=0;i<DATA.length;i++){
-    var x=DATA[i];
-    var src=(FIELD==='name')?x.name:(FIELD==='id')?x.id:(FIELD==='plate')?(x.plate1+x.plate2+x.num1+x.num2):(x.name+x.id+x.plate1+x.plate2+x.num1+x.num2);
-    if(src.indexOf(q)>=0)hits.push(i);
-  }
-  stEl.textContent='نتائج: '+hits.length+' سجل';
-  if(!hits.length){resEl.innerHTML='<div class="empty">لا توجد نتائج</div>';return;}
-  var html='',max=Math.min(hits.length,50);
-  for(var j=0;j<max;j++){
-    var x=DATA[hits[j]];
-    var e1=expClass(x.exp1),e2=expClass(x.exp2);
-    var ps=getPermitStatus(x.remaining,x.end);
-    html+='<div class="card">';
-    html+='<div class="card-header"><div><div class="card-name">'+esc(x.name||'—')+'</div>';
-    if(x.id)html+='<div class="card-id-small">'+esc(x.id)+'</div>';
-    html+='</div><div class="card-no"># '+esc(x.no)+'</div></div>';
-    html+='<div class="field-grid">';
-    html+=fld('القاطرة',x.plate1||x.num1,'');
-    html+=fld('انتهاء القاطرة',x.exp1,e1);
-    html+=fld('المقطورة',x.plate2||x.num2,'');
-    html+=fld('انتهاء المقطورة',x.exp2,e2);
-    html+=fld('أول الإشارة',x.start,'','start-field');
-    html+=fld('نهاية الإشارة',x.end, ps==='danger'?'danger':ps==='warn'?'warn':'');
-    html+=fld('باقى على الانتهاء',x.remaining, ps==='danger'?'danger':ps==='warn'?'warn':'');
-    html+='</div>';
-    var b='';
-    if(x.plate1)b+='<span class="badge bb">'+esc(x.plate1)+'</span>';
-    if(x.plate2)b+='<span class="badge bg">'+esc(x.plate2)+'</span>';
-    if(ps==='danger')b+='<span class="badge br">⚠ الإشارة منتهية</span>';
-    else if(ps==='warn')b+='<span class="badge ba">⏰ الإشارة قريبة الانتهاء</span>';
-    if(b)html+='<div class="badge-row">'+b+'</div>';
-    html+='</div>';
-  }
-  if(hits.length>50)html+='<div class="empty" style="padding:14px">يعرض أول 50 من '+hits.length+'</div>';
-  resEl.innerHTML=html;
-}
-
-function fld(label,v,ec,fc){
-  return'<div class="field'+(fc?' '+fc:'')+'"><div class="fl">'+label+'</div>'+(v?'<div class="fv '+(ec||'')+'">'+esc(v)+'</div>':'<div class="fv empty">—</div>')+'</div>';
-}
-function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-var tt=null;
-function showToast(msg){
-  var t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  if(tt)clearTimeout(tt);
-  tt=setTimeout(function(){t.classList.remove('show');},3500);
-}
-
-document.getElementById('qInput').addEventListener('input',doSearch);
-setInterval(loadData,30*60*1000);
-loadData();
+// Init step UI
+updateStepUI();
 </script>
 </body>
 </html>
