@@ -305,7 +305,7 @@ let photos       = [null, null];
 // ══════════════════════════════════════
 window.doLogin = function() {
   if (typeof google === 'undefined') { showToast('جاري تحميل Google…',''); return; }
-  google.accounts.id.initialize({ client_id: '181519120891-lpce9uf7mhktv12345.apps.googleusercontent.com', callback: handleCred });
+  google.accounts.id.initialize({ client_id: '181519120891-lpce9uf7dlibmhrmj9a79j2o5aj3lp6g.apps.googleusercontent.com', callback: handleCred });
   google.accounts.id.prompt();
 };
 
