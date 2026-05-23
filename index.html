@@ -596,7 +596,7 @@ async function handleCredential(response) {
     const email = payload.email;
 
     // Check if email is allowed via Apps Script
-    const res = await fetch(`${CONFIG.APPS_SCRIPT}?action=checkUser&email=${encodeURIComponent(email)}`);
+    const res = await fetch(`${CONFIG.APPS_SCRIPT}?action=checkUser&email=${encodeURIComponent(email)}`, {redirect:'follow'});
     const data = await res.json();
 
     if (!data.allowed) {
@@ -662,7 +662,7 @@ async function doSearch() {
   btn.innerHTML = '<div class="spinner" style="border-top-color:#fff"></div> جاري البحث…';
 
   try {
-    const res = await fetch(`${CONFIG.APPS_SCRIPT}?action=search&nid=${nid}&sheet=${CONFIG.SEARCH_SHEET}`);
+    const res = await fetch(`${CONFIG.APPS_SCRIPT}?action=search&nid=${nid}`, {redirect:'follow'});
     const data = await res.json();
     renderSearchResult(nid, data);
   } catch (e) {
@@ -840,7 +840,7 @@ function setAiStatus(msg, loading) {
 
 async function checkDuplicate(nid) {
   try {
-    const res = await fetch(`${CONFIG.APPS_SCRIPT}?action=search&nid=${nid}&sheet=${CONFIG.SEARCH_SHEET}`);
+    const res = await fetch(`${CONFIG.APPS_SCRIPT}?action=search&nid=${nid}`, {redirect:'follow'});
     const data = await res.json();
     if (data.found) {
       const w = document.getElementById('dupWarning');
@@ -926,13 +926,14 @@ function buildSummary() {
 
 // ══════════════════════════════════════
 //  SAVE
+//  نبعت الـ POST بـ text/plain عشان Apps Script
+//  يقبله بدون preflight CORS request
 // ══════════════════════════════════════
 async function doSave() {
   showLoader('جاري الرفع على Google Drive…');
   try {
     const payload = {
       action: 'save',
-      sheet: CONFIG.SAVE_SHEET,
       name:       document.getElementById('f_name').value,
       nid:        document.getElementById('f_nid').value,
       type:       document.getElementById('f_type').value,
@@ -948,10 +949,15 @@ async function doSave() {
       userEmail:  currentUser?.email || '',
     };
 
+    // ✅ text/plain بيتجنب الـ preflight OPTIONS request
+    // اللي بيسبب مشكلة CORS مع Apps Script
     const res = await fetch(CONFIG.APPS_SCRIPT, {
-      method: 'POST',
-      body: JSON.stringify(payload),
+      method:   'POST',
+      redirect: 'follow',
+      headers:  { 'Content-Type': 'text/plain' },
+      body:     JSON.stringify(payload),
     });
+
     const data = await res.json();
 
     if (data.success) {
