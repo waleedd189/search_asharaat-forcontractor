@@ -419,15 +419,14 @@ async function loadAll() {
 async function loadSignals() {
   setLoading('signalsBody', 11);
   try {
-    const res  = await fetch(`${CFG.APPS_SCRIPT}?action=getAll&sheet=${CFG.SAVE_SHEET}`);
-    const data = await res.json();
+    const data = await gasGet({action:'getAll'});
     allSignals = data.rows || [];
     renderSignals(allSignals);
     renderRecent(allSignals.slice(-5).reverse());
     populateContractorFilter();
     document.getElementById('signalsCount').textContent = `${allSignals.length} إشارة مسجلة`;
   } catch(e) {
-    setError('signalsBody', 11, 'خطأ في التحميل');
+    setError('signalsBody', 11, 'خطأ في التحميل: ' + e.message);
   }
 }
 
@@ -512,12 +511,11 @@ function updateStats() {
 async function loadContractors() {
   setLoading('contractorsBody', 6);
   try {
-    const res  = await fetch(`${CFG.APPS_SCRIPT}?action=getContractors`);
-    const data = await res.json();
+    const data = await gasGet({action:'getContractors'});
     allContractors = data.contractors || [];
     renderContractors();
   } catch(e) {
-    setError('contractorsBody', 6, 'خطأ في التحميل');
+    setError('contractorsBody', 6, 'خطأ في التحميل: ' + e.message);
   }
 }
 
@@ -550,32 +548,24 @@ async function addContractor() {
   if (!name || !email) { showToast('أدخل الاسم والإيميل', 'error'); return; }
   if (!email.includes('@')) { showToast('إيميل غير صحيح', 'error'); return; }
   try {
-    const res  = await fetch(CFG.APPS_SCRIPT, {
-      method:'POST',
-      body:JSON.stringify({action:'addContractor', name, email})
-    });
-    const data = await res.json();
+    const data = await gasGet({action:'addContractor', name, email});
     if (data.success) {
       showToast('✅ تمت الإضافة', 'success');
       document.getElementById('newName').value='';
       document.getElementById('newEmail').value='';
       loadContractors();
-    } else throw new Error(data.error);
+    } else throw new Error(data.error || 'خطأ غير معروف');
   } catch(e) { showToast('خطأ: '+e.message,'error'); }
 }
 
 async function deleteContractor(email, name) {
   if (!confirm(`حذف المقاول: ${name}؟`)) return;
   try {
-    const res  = await fetch(CFG.APPS_SCRIPT, {
-      method:'POST',
-      body:JSON.stringify({action:'deleteContractor', email})
-    });
-    const data = await res.json();
+    const data = await gasGet({action:'deleteContractor', email});
     if (data.success) {
       showToast('تم الحذف', 'info');
       loadContractors();
-    } else throw new Error(data.error);
+    } else throw new Error(data.error || 'خطأ غير معروف');
   } catch(e) { showToast('خطأ: '+e.message,'error'); }
 }
 
@@ -619,6 +609,21 @@ document.getElementById('photoModal').addEventListener('click', e=>{
 // ══════════════════════════════════════
 //  HELPERS
 // ══════════════════════════════════════
+// ══════════════════════════════════════
+//  gasGet — كل الطلبات عبر GET لتفادي CORS
+//  Apps Script يعمل redirect، fetch يتبعه تلقائياً
+// ══════════════════════════════════════
+async function gasGet(params) {
+  const url = new URL(CFG.APPS_SCRIPT);
+  Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, v));
+  const res = await fetch(url.toString(), {
+    method: 'GET',
+    redirect: 'follow',
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return await res.json();
+}
+
 function setLoading(tbodyId, cols) {
   document.getElementById(tbodyId).innerHTML =
     `<tr class="loading-row"><td colspan="${cols}"><div class="spinner"></div> جاري التحميل…</td></tr>`;
