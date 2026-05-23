@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,20 +21,21 @@
   --gold:#f59e0b; --ok:#10b981; --err:#ef4444;
   --txt:#e2e8f0; --muted:#64748b; --r:14px;
 }
+html,body{height:100%;width:100%}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-height:100dvh;display:flex;flex-direction:column}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;overflow-x:hidden}
 
 /* LOGIN */
-#gate{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
-.g-card{width:100%;max-width:360px;background:var(--surf);border:1px solid var(--border);border-radius:20px;padding:32px 24px;text-align:center;box-shadow:0 0 60px rgba(14,165,233,.1)}
+#gate{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;min-height:100dvh;min-height:100vh}
+.g-card{width:100%;max-width:400px;background:var(--surf);border:1px solid var(--border);border-radius:20px;padding:36px 24px;text-align:center;box-shadow:0 0 60px rgba(14,165,233,.1)}
 .g-logo{width:72px;height:72px;background:linear-gradient(135deg,var(--accent),#0369a1);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 20px;box-shadow:0 0 30px rgba(14,165,233,.35)}
-.g-title{font-size:22px;font-weight:900;color:#fff;margin-bottom:6px}
-.g-sub{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.6}
-.btn-google{width:100%;padding:14px;background:#fff;color:#1f2937;border:none;border-radius:12px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s}
+.g-title{font-size:26px;font-weight:900;color:#fff;margin-bottom:8px}
+.g-sub{font-size:15px;color:var(--muted);margin-bottom:28px;line-height:1.6}
+.btn-google{width:100%;padding:16px;background:#fff;color:#1f2937;border:none;border-radius:14px;font-family:'Cairo',sans-serif;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s}
 .btn-google:hover{background:#f8fafc;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.2)}
-.btn-google svg{width:20px;height:20px;flex-shrink:0}
-.g-err{color:var(--err);font-size:13px;margin-top:12px;display:none}
-.g-note{font-size:11px;color:var(--muted);margin-top:16px}
+.btn-google svg{width:22px;height:22px;flex-shrink:0}
+.g-err{color:var(--err);font-size:14px;margin-top:12px;display:none}
+.g-note{font-size:13px;color:var(--muted);margin-top:16px}
 
 /* HEADER */
 .hdr{background:linear-gradient(135deg,#0f172a,#1e3a5f);border-bottom:1px solid var(--border);padding:14px 16px 10px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
