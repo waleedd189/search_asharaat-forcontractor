@@ -1,122 +1,74 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html dir="rtl" lang="ar">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة الأدمن — نظام الإشارات</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة الأدمن — الاشارات</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{
-  --bg:#060b14;--surf:#0d1520;--surf2:#111e2e;--surf3:#172133;
-  --border:#1a3050;--accent:#0ea5e9;--gold:#f59e0b;
-  --ok:#10b981;--err:#ef4444;--txt:#e2e8f0;--muted:#4a6580;--r:12px;
-}
 *{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0e1a;--surf:#0f1829;--surf2:#111e2e;--brd:#1e2d4a;--blue:#2563eb;--blue2:#1d4ed8;--green:#10b981;--red:#ef4444;--txt:#e2e8f0;--muted:#475569}
 body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
 
 /* LOGIN */
-#loginScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:500;padding:20px}
-.lbox{width:100%;max-width:360px;background:var(--surf);border:1px solid var(--border);border-radius:20px;padding:36px 28px;text-align:center}
-.lico{font-size:44px;margin-bottom:14px}
-.ltitle{font-size:22px;font-weight:900;color:#fff;margin-bottom:6px}
+#loginScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}
+#loginScreen.hide{display:none}
+.lbox{width:100%;max-width:360px;background:var(--surf);border:1px solid var(--brd);border-radius:24px;padding:36px 28px;text-align:center}
+.lico{font-size:48px;margin-bottom:14px}
+.ltitle{font-size:22px;font-weight:900;color:#fff;margin-bottom:4px}
 .lsub{font-size:13px;color:var(--muted);margin-bottom:24px}
-.linput{width:100%;padding:12px;background:var(--surf2);border:1.5px solid var(--border);border-radius:10px;color:var(--txt);font-family:'Cairo',sans-serif;font-size:15px;outline:none;text-align:center;letter-spacing:3px;margin-bottom:12px}
-.linput:focus{border-color:var(--accent)}
-.lbtn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),#0369a1);color:#fff;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:700;cursor:pointer}
-.lerr{color:var(--err);font-size:13px;margin-top:10px;display:none}
+.linp{width:100%;background:rgba(255,255,255,0.05);border:1.5px solid var(--brd);border-radius:12px;padding:13px 16px;color:var(--txt);font-family:'Cairo',sans-serif;font-size:15px;outline:none;text-align:center;letter-spacing:3px;margin-bottom:12px;transition:border-color .2s}
+.linp:focus{border-color:var(--blue)}
+.lbtn{width:100%;background:linear-gradient(135deg,var(--blue),var(--blue2));border:none;border-radius:12px;padding:14px;color:#fff;font-family:'Cairo',sans-serif;font-size:15px;font-weight:700;cursor:pointer}
+.lerr{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:10px;color:#fca5a5;font-size:13px;margin-top:10px;display:none}
 
-/* LAYOUT */
-.sidebar{width:220px;height:100vh;position:fixed;top:0;right:0;background:var(--surf);border-left:1px solid var(--border);display:flex;flex-direction:column;padding:20px 0}
-.logo{padding:0 18px 20px;border-bottom:1px solid var(--border);margin-bottom:10px}
-.logo-t{font-size:17px;font-weight:900;color:#fff;display:flex;align-items:center;gap:8px}
-.logo-s{font-size:11px;color:var(--muted);margin-top:3px}
-.nav{display:flex;align-items:center;gap:9px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;border-right:3px solid transparent}
-.nav:hover{color:var(--txt);background:var(--surf2)}
-.nav.on{color:var(--accent);border-right-color:var(--accent);background:rgba(14,165,233,.08)}
-.nav-ico{font-size:17px}
-.sf{margin-top:auto;padding:14px 18px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)}
-.sf a{color:var(--accent);text-decoration:none}
+/* APP */
+#adminApp{display:none;min-height:100vh}
+.topbar{background:rgba(10,14,26,0.97);border-bottom:1px solid var(--brd);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-ico{width:38px;height:38px;background:linear-gradient(135deg,var(--blue),var(--blue2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.brand-name{font-size:15px;font-weight:900;color:#fff}
+.brand-sub{font-size:11px;color:#3b82f6}
+.btn-logout{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);color:#fca5a5;border-radius:8px;padding:7px 14px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
 
-.main{margin-right:220px;padding:24px;min-height:100vh}
-.page{display:none}
-.page.on{display:block}
-
-/* PAGE HEADER */
-.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px}
-.ph-title{font-size:20px;font-weight:900;color:#fff}
-.ph-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.main{padding:20px;max-width:640px;margin:0 auto}
 
 /* STATS */
-.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
-.stat{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:16px;position:relative;overflow:hidden}
-.stat-n{font-size:26px;font-weight:900;color:#fff}
-.stat-l{font-size:12px;color:var(--muted);margin-top:3px}
-.stat-i{position:absolute;top:12px;left:12px;font-size:20px;opacity:.5}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.stat{background:var(--surf);border:1px solid var(--brd);border-radius:16px;padding:16px;text-align:center}
+.stat-val{font-size:32px;font-weight:900;color:#3b82f6}
+.stat-lbl{font-size:12px;color:var(--muted);margin-top:4px}
 
-/* BUTTONS */
-.btn{padding:9px 14px;border:none;border-radius:8px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:5px}
-.btn-a{background:var(--accent);color:#fff}
-.btn-a:hover{filter:brightness(1.1)}
-.btn-g{background:var(--ok);color:#fff}
-.btn-g:hover{filter:brightness(1.1)}
-.btn-d{background:rgba(239,68,68,.12);color:var(--err);border:1px solid rgba(239,68,68,.2)}
-.btn-d:hover{background:rgba(239,68,68,.2)}
-.btn-gh{background:var(--surf2);color:var(--txt);border:1px solid var(--border)}
-.btn-gh:hover{background:var(--surf3)}
+/* SECTION */
+.sec{background:var(--surf);border:1px solid var(--brd);border-radius:20px;padding:20px;margin-bottom:16px}
+.sec-title{font-size:15px;font-weight:900;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:8px}
 
-/* TABLE */
-.tw{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-.tb{display:flex;align-items:center;gap:9px;padding:12px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
-.srch{flex:1;min-width:180px;padding:8px 12px;background:var(--surf2);border:1.5px solid var(--border);border-radius:7px;color:var(--txt);font-family:'Cairo',sans-serif;font-size:13px;outline:none}
-.srch:focus{border-color:var(--accent)}
-.tbl-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:12px}
-thead tr{background:var(--surf2)}
-th{padding:10px 12px;text-align:right;font-weight:700;color:var(--muted);font-size:11px;white-space:nowrap}
-td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
-tr:hover td{background:rgba(255,255,255,.02)}
-tr:last-child td{border:none}
-.pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700}
-.pill-g{background:rgba(16,185,129,.12);color:var(--ok)}
-.pill-b{background:rgba(14,165,233,.1);color:var(--accent)}
-.pill-r{background:rgba(239,68,68,.1);color:var(--err)}
-.pill-y{background:rgba(245,158,11,.1);color:var(--gold)}
+/* ADD */
+.add-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.inp{flex:1;min-width:140px;background:rgba(255,255,255,0.05);border:1.5px solid var(--brd);border-radius:10px;padding:10px 14px;color:var(--txt);font-family:'Cairo',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+.inp:focus{border-color:var(--blue)}
+.btn-add{background:linear-gradient(135deg,var(--green),#059669);border:none;border-radius:10px;padding:10px 18px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.btn-add:disabled{opacity:0.6;cursor:not-allowed}
 
-/* ADD FORM */
-.add-form{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:18px}
-.add-row{display:flex;gap:9px;flex-wrap:wrap}
-.add-row input{flex:1;min-width:160px;padding:10px 12px;background:var(--surf2);border:1.5px solid var(--border);border-radius:8px;color:var(--txt);font-family:'Cairo',sans-serif;font-size:13px;outline:none}
-.add-row input:focus{border-color:var(--accent)}
-
-/* MODAL */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
-.modal-bg.on{display:flex}
-.modal{background:var(--surf);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:480px}
-.modal h3{font-size:16px;font-weight:900;margin-bottom:14px;color:#fff}
-.modal-imgs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.modal-imgs img{width:100%;border-radius:8px;object-fit:cover}
-.modal-close{display:block;width:100%;margin-top:14px;padding:10px;background:var(--surf2);border:1px solid var(--border);color:var(--txt);border-radius:8px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+/* LIST */
+.user-item{background:rgba(255,255,255,0.03);border:1px solid var(--brd);border-radius:12px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;transition:.15s}
+.user-item:hover{background:rgba(255,255,255,0.05)}
+.user-info{display:flex;flex-direction:column;gap:3px}
+.user-name{font-size:14px;font-weight:700;color:#fff}
+.user-email{font-size:12px;color:#3b82f6;direction:ltr;text-align:right}
+.btn-del{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);color:#fca5a5;border-radius:8px;padding:6px 14px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:.15s;white-space:nowrap}
+.btn-del:hover{background:rgba(239,68,68,0.2)}
+.empty-list{text-align:center;padding:30px;color:var(--muted);font-size:13px}
 
 /* TOAST */
-.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:11px 18px;font-size:13px;font-weight:600;box-shadow:0 4px 24px rgba(0,0,0,.4);z-index:900;transition:transform .3s;white-space:nowrap}
-.toast.on{transform:translateX(-50%) translateY(0)}
-.toast.ok{border-right:3px solid var(--ok)}
-.toast.err{border-right:3px solid var(--err)}
-.toast.info{border-right:3px solid var(--accent)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);border-radius:12px;padding:11px 22px;font-size:13px;font-weight:700;z-index:999;transition:transform .3s ease;white-space:nowrap;pointer-events:none;font-family:'Cairo',sans-serif}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.ok{background:#052e16;border:1px solid #16a34a;color:#4ade80}
+.toast.err{background:#200a0a;border:1px solid #7f1d1d;color:#fca5a5}
 
-.spin{display:inline-block;width:18px;height:18px;border:2px solid rgba(14,165,233,.2);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-left:6px}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
-.ldrow td{text-align:center;padding:24px;color:var(--muted)}
-
-/* EMPTY */
-.empty{text-align:center;padding:40px 20px;color:var(--muted)}
-.empty-ico{font-size:36px;margin-bottom:10px}
-
-@media(max-width:768px){
-  .sidebar{display:none}
-  .main{margin-right:0;padding:14px}
-}
+.loading{text-align:center;padding:30px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -126,395 +78,195 @@ tr:last-child td{border:none}
   <div class="lbox">
     <div class="lico">🔐</div>
     <div class="ltitle">لوحة الأدمن</div>
-    <div class="lsub">نظام إشارات المقاولين</div>
-    <input class="linput" type="password" id="pw" placeholder="••••••••"
+    <div class="lsub">نظام إدارة الاشارات</div>
+    <input class="linp" type="password" id="pw" placeholder="••••••••"
       onkeydown="if(event.key==='Enter')checkPw()">
-    <button class="lbtn" onclick="checkPw()">دخول</button>
-    <div class="lerr" id="pwErr">❌ كلمة المرور غير صحيحة</div>
+    <button class="lbtn" onclick="checkPw()">دخول ←</button>
+    <div class="lerr" id="pwErr">❌ كلمة المرور غلط</div>
   </div>
 </div>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-  <div class="logo">
-    <div class="logo-t">🚦 نظام الإشارات</div>
-    <div class="logo-s">لوحة التحكم</div>
-  </div>
-  <div class="nav on"  onclick="goPage('dash',this)"><span class="nav-ico">📊</span>الرئيسية</div>
-  <div class="nav"     onclick="goPage('sigs',this)"><span class="nav-ico">📋</span>الإشارات</div>
-  <div class="nav"     onclick="goPage('cons',this)"><span class="nav-ico">👷</span>المقاولون</div>
-  <div class="sf">
-    نظام الإشارات v2.0<br>
-    <a href="index.html">← العودة للتطبيق</a>
-  </div>
-</div>
-
-<!-- MAIN -->
-<div class="main">
-
-  <!-- DASHBOARD -->
-  <div class="page on" id="pg-dash">
-    <div class="ph">
-      <div><div class="ph-title">الرئيسية</div><div class="ph-sub">نظرة عامة</div></div>
-      <button class="btn btn-a" onclick="loadAll()">🔄 تحديث</button>
+<!-- ADMIN APP -->
+<div id="adminApp">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-ico">🚦</div>
+      <div>
+        <div class="brand-name">لوحة الأدمن</div>
+        <div class="brand-sub">إدارة الاشارات</div>
+      </div>
     </div>
+    <button class="btn-logout" onclick="doLogout()">خروج</button>
+  </div>
+
+  <div class="main">
+
+    <!-- STATS -->
     <div class="stats">
-      <div class="stat"><div class="stat-n" id="stTotal">—</div><div class="stat-l">إجمالي الإشارات</div><div class="stat-i">📋</div></div>
-      <div class="stat"><div class="stat-n" id="stToday">—</div><div class="stat-l">إشارات اليوم</div><div class="stat-i">📅</div></div>
-      <div class="stat"><div class="stat-n" id="stCons">—</div><div class="stat-l">المقاولون</div><div class="stat-i">👷</div></div>
-      <div class="stat"><div class="stat-n" id="stWeek">—</div><div class="stat-l">إشارات الأسبوع</div><div class="stat-i">📈</div></div>
-    </div>
-    <div class="tw">
-      <div class="tb"><span style="font-weight:700;font-size:14px">⏱️ آخر الإشارات</span></div>
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr><th>#</th><th>الاسم</th><th>الرقم القومي</th><th>المقاول</th><th>التاريخ</th></tr></thead>
-          <tbody id="recentBody"><tr class="ldrow"><td colspan="5"><div class="spin"></div> جاري التحميل…</td></tr></tbody>
-        </table>
+      <div class="stat">
+        <div class="stat-val" id="statCount">—</div>
+        <div class="stat-lbl">إجمالي المقاولين</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="statNew">—</div>
+        <div class="stat-lbl">مضاف اليوم</div>
       </div>
     </div>
-  </div>
 
-  <!-- SIGNALS -->
-  <div class="page" id="pg-sigs">
-    <div class="ph">
-      <div><div class="ph-title">جدول الإشارات</div><div class="ph-sub" id="sigCount">—</div></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-g" onclick="exportExcel()">📥 Excel</button>
-        <button class="btn btn-a" onclick="loadSignals()">🔄 تحديث</button>
-      </div>
-    </div>
-    <div class="tw">
-      <div class="tb">
-        <input class="srch" id="sigSrch" placeholder="🔍 بحث بالاسم أو الرقم القومي…" oninput="filterSigs()">
-        <select class="srch" id="conFilter" style="flex:0 0 160px" onchange="filterSigs()">
-          <option value="">كل المقاولين</option>
-        </select>
-      </div>
-      <div class="tbl-wrap">
-        <table id="sigTable">
-          <thead><tr>
-            <th>#</th><th>الاسم</th><th>الرقم القومي</th><th>النوع</th>
-            <th>القاطرة</th><th>انتهاء القاطرة</th>
-            <th>المقطورة</th><th>انتهاء المقطورة</th>
-            <th>المقاول</th><th>التاريخ</th><th>صور</th>
-          </tr></thead>
-          <tbody id="sigBody"><tr class="ldrow"><td colspan="11"><div class="spin"></div> جاري التحميل…</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- CONTRACTORS -->
-  <div class="page" id="pg-cons">
-    <div class="ph">
-      <div><div class="ph-title">إدارة المقاولين</div><div class="ph-sub">الإيميلات المسموح لها بالدخول</div></div>
-      <button class="btn btn-a" onclick="loadContractors()">🔄 تحديث</button>
-    </div>
-    <div class="add-form">
-      <div style="font-weight:700;margin-bottom:12px;font-size:14px">➕ إضافة مقاول جديد</div>
+    <!-- ADD USER -->
+    <div class="sec">
+      <div class="sec-title">➕ إضافة مقاول جديد</div>
       <div class="add-row">
-        <input type="text"  id="newName"  placeholder="اسم المقاول">
-        <input type="email" id="newEmail" placeholder="الإيميل (gmail)">
-        <button class="btn btn-a" onclick="addContractor()">إضافة</button>
+        <input type="text" class="inp" id="newName" placeholder="الاسم">
+        <input type="email" class="inp" id="newEmail" placeholder="example@gmail.com"
+          onkeydown="if(event.key==='Enter')addUser()">
       </div>
+      <button class="btn-add" id="addBtn" onclick="addUser()">
+        ✅ إضافة
+      </button>
     </div>
-    <div class="tw">
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr><th>#</th><th>الاسم</th><th>الإيميل</th><th>عدد الإشارات</th><th>إجراء</th></tr></thead>
-          <tbody id="consBody"><tr class="ldrow"><td colspan="5"><div class="spin"></div> جاري التحميل…</td></tr></tbody>
-        </table>
-      </div>
+
+    <!-- USERS LIST -->
+    <div class="sec">
+      <div class="sec-title">👥 المقاولين المصرح ليهم</div>
+      <div id="usersList"><div class="loading"><div class="spin"></div></div></div>
     </div>
-  </div>
 
-</div>
-
-<!-- PHOTO MODAL -->
-<div class="modal-bg" id="photoModal">
-  <div class="modal">
-    <h3>📷 صور الإشارة</h3>
-    <div class="modal-imgs" id="modalImgs"></div>
-    <button class="modal-close" onclick="closeModal()">إغلاق</button>
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- Firebase -->
 <script type="module">
-import { initializeApp }   from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js';
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, serverTimestamp, Timestamp }
-                           from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
+import { initializeApp }              from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-// ══════════════════════════════════════
-//  CONFIG
-// ══════════════════════════════════════
-const ADMIN_PASS = 'Admin@2025'; // ← غيّر هذا
-const FB = {
-  apiKey:            'AIzaSyCmLfaEb7lPCWaqiQLNRsqWUjuTya4xWF0',
-  authDomain:        'asharaat-search.firebaseapp.com',
-  projectId:         'asharaat-search',
-  storageBucket:     'asharaat-search.firebasestorage.app',
-  messagingSenderId: '930583092172',
-  appId:             '1:930583092172:web:89aaf88198c3b1d1195b69',
+const ADMIN_PASS = 'admin2026';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCmLfaEb7lPCWaqiQLNRsqWUjuTya4xWF0",
+  authDomain: "asharaat-search.firebaseapp.com",
+  projectId: "asharaat-search",
+  storageBucket: "asharaat-search.firebasestorage.app",
+  messagingSenderId: "930583092172",
+  appId: "1:930583092172:web:89aaf88198c3b1d1195b69"
 };
 
-const fbApp = initializeApp(FB);
-const db    = getFirestore(fbApp);
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
 
-// ══════════════════════════════════════
-//  STATE
-// ══════════════════════════════════════
-let allSignals     = [];
-let allContractors = [];
-
-// ══════════════════════════════════════
-//  LOGIN
-// ══════════════════════════════════════
-window.checkPw = function() {
-  if (document.getElementById('pw').value === ADMIN_PASS) {
-    document.getElementById('loginScreen').style.display = 'none';
-    loadAll();
+// ── LOGIN ──────────────────────────────────────────
+window.checkPw = function(){
+  var pw = document.getElementById('pw').value;
+  if(pw === ADMIN_PASS){
+    document.getElementById('loginScreen').classList.add('hide');
+    document.getElementById('adminApp').style.display = 'block';
+    loadUsers();
   } else {
     document.getElementById('pwErr').style.display = 'block';
-    document.getElementById('pw').value = '';
   }
 };
 
-// ══════════════════════════════════════
-//  NAVIGATION
-// ══════════════════════════════════════
-window.goPage = function(name, el) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('on'));
-  document.getElementById('pg-'+name).classList.add('on');
-  if(el) el.classList.add('on');
-  if(name==='sigs') loadSignals();
-  if(name==='cons') loadContractors();
+window.doLogout = function(){
+  document.getElementById('loginScreen').classList.remove('hide');
+  document.getElementById('adminApp').style.display = 'none';
+  document.getElementById('pw').value = '';
 };
 
-// ══════════════════════════════════════
-//  LOAD ALL
-// ══════════════════════════════════════
-window.loadAll = async function() {
-  await Promise.all([loadSignals(), loadContractors()]);
-  updateStats();
-};
+// ── LOAD USERS ─────────────────────────────────────
+var allUsers = [];
 
-// ══════════════════════════════════════
-//  SIGNALS — Firebase Firestore
-// ══════════════════════════════════════
-window.loadSignals = async function() {
-  setLoad('sigBody',11);
+async function loadUsers(){
+  document.getElementById('usersList').innerHTML = '<div class="loading"><div class="spin"></div></div>';
   try {
-    const q    = query(collection(db,'signals'), orderBy('createdAt','desc'));
-    const snap = await getDocs(q);
-    allSignals = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-    renderSigs(allSignals);
-    renderRecent(allSignals.slice(0,5));
-    fillConFilter();
-    document.getElementById('sigCount').textContent = allSignals.length + ' إشارة مسجلة';
+    var snap = await getDocs(collection(db,'contractors'));
+    allUsers = snap.docs.map(function(d){ return {id:d.id, ...d.data()}; });
+    renderUsers();
     updateStats();
-  } catch(e) {
-    setErr('sigBody',11,'خطأ في التحميل: '+e.message);
+  } catch(e){
+    document.getElementById('usersList').innerHTML = '<div class="empty-list">❌ خطأ: '+e.message+'</div>';
   }
-};
+}
 
-function renderSigs(rows) {
-  const b = document.getElementById('sigBody');
-  if (!rows.length) { b.innerHTML=`<tr class="ldrow"><td colspan="11"><div class="empty"><div class="empty-ico">📭</div>لا توجد إشارات بعد</div></td></tr>`; return; }
-  b.innerHTML = rows.map((r,i) => {
-    const dt = fmtDate(r.createdAt);
-    const trkExp = r.trk_exp || '';
-    const trlExp = r.trl_exp || '';
-    return `<tr>
-      <td style="color:var(--muted)">${i+1}</td>
-      <td style="font-weight:700">${r.name||'—'}</td>
-      <td style="font-family:monospace;letter-spacing:1px;font-size:11px">${r.nid||'—'}</td>
-      <td><span class="pill pill-b">${r.type||'—'}</span></td>
-      <td>${(r.trk_l||'')} ${(r.trk_n||'')}</td>
-      <td><span class="pill ${isExp(trkExp)?'pill-r':'pill-g'}">${trkExp||'—'}</span></td>
-      <td>${(r.trl_l||'')} ${(r.trl_n||'')}</td>
-      <td><span class="pill ${isExp(trlExp)?'pill-r':'pill-g'}">${trlExp||'—'}</span></td>
-      <td><span class="pill pill-y">${r.contractor||'—'}</span></td>
-      <td style="color:var(--muted);font-size:11px">${dt}</td>
-      <td>${(r.photo0||r.photo1)?`<button class="btn btn-gh" style="padding:5px 10px;font-size:11px" onclick='showPhotos("${r.photo0||''}","${r.photo1||''}")'>📷</button>`:'—'}</td>
-    </tr>`;
+function renderUsers(){
+  var el = document.getElementById('usersList');
+  if(!allUsers.length){
+    el.innerHTML = '<div class="empty-list">مفيش مقاولين مضافين لحد دلوقتي</div>';
+    return;
+  }
+  el.innerHTML = allUsers.map(function(u){
+    return '<div class="user-item">'
+      + '<div class="user-info">'
+      + '<div class="user-name">'+(u.name||'—')+'</div>'
+      + '<div class="user-email">'+(u.email||'—')+'</div>'
+      + '</div>'
+      + '<button class="btn-del" onclick="delUser(\''+u.id+'\',\''+u.name+'\')">🗑 حذف</button>'
+      + '</div>';
   }).join('');
 }
 
-window.filterSigs = function() {
-  const q = document.getElementById('sigSrch').value.toLowerCase();
-  const c = document.getElementById('conFilter').value;
-  const f = allSignals.filter(r=>{
-    const t=(r.name||'')+(r.nid||'')+(r.contractor||'');
-    return (!q||t.toLowerCase().includes(q))&&(!c||(r.contractor||'')===c);
-  });
-  renderSigs(f);
-};
-
-function fillConFilter() {
-  const sel = document.getElementById('conFilter');
-  const cur = sel.value;
-  const uq  = [...new Set(allSignals.map(r=>r.contractor).filter(Boolean))];
-  sel.innerHTML = '<option value="">كل المقاولين</option>' + uq.map(c=>`<option value="${c}">${c}</option>`).join('');
-  sel.value = cur;
-}
-
-function renderRecent(rows) {
-  const b = document.getElementById('recentBody');
-  if(!rows.length){b.innerHTML=`<tr class="ldrow"><td colspan="5">لا توجد بيانات</td></tr>`;return;}
-  b.innerHTML = rows.map((r,i)=>`<tr>
-    <td>${i+1}</td>
-    <td style="font-weight:700">${r.name||'—'}</td>
-    <td style="font-family:monospace;font-size:11px">${r.nid||'—'}</td>
-    <td>${r.contractor||'—'}</td>
-    <td style="color:var(--muted);font-size:11px">${fmtDate(r.createdAt)}</td>
-  </tr>`).join('');
-}
-
-// ══════════════════════════════════════
-//  STATS
-// ══════════════════════════════════════
-function updateStats() {
-  const today   = new Date(); today.setHours(0,0,0,0);
-  const weekAgo = new Date(Date.now()-7*864e5);
-  const todayCount = allSignals.filter(r=>{
-    const d = r.createdAt?.toDate?.(); return d && d >= today;
+function updateStats(){
+  document.getElementById('statCount').textContent = allUsers.length;
+  var today = new Date().toDateString();
+  var todayCount = allUsers.filter(function(u){
+    if(!u.createdAt) return false;
+    var d = u.createdAt.toDate ? u.createdAt.toDate() : new Date(u.createdAt);
+    return d.toDateString() === today;
   }).length;
-  const weekCount = allSignals.filter(r=>{
-    const d = r.createdAt?.toDate?.(); return d && d >= weekAgo;
-  }).length;
-  document.getElementById('stTotal').textContent = allSignals.length;
-  document.getElementById('stToday').textContent = todayCount;
-  document.getElementById('stCons').textContent  = allContractors.length;
-  document.getElementById('stWeek').textContent  = weekCount;
+  document.getElementById('statNew').textContent = todayCount;
 }
 
-// ══════════════════════════════════════
-//  CONTRACTORS — Firebase
-// ══════════════════════════════════════
-window.loadContractors = async function() {
-  setLoad('consBody',5);
+// ── ADD USER ───────────────────────────────────────
+window.addUser = async function(){
+  var name  = document.getElementById('newName').value.trim();
+  var email = document.getElementById('newEmail').value.trim().toLowerCase();
+  var btn   = document.getElementById('addBtn');
+
+  if(!name){ toast('⚠️ أدخل الاسم','err'); return; }
+  if(!email || !email.includes('@')){ toast('⚠️ أدخل إيميل صحيح','err'); return; }
+  if(allUsers.find(function(u){ return u.email===email; })){ toast('⚠️ الإيميل موجود بالفعل','err'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> جاري الإضافة...';
+
   try {
-    const snap = await getDocs(collection(db,'contractors'));
-    allContractors = snap.docs.map(d=>({id:d.id,...d.data()}));
-    renderCons();
-  } catch(e) { setErr('consBody',5,'خطأ: '+e.message); }
+    await addDoc(collection(db,'contractors'),{
+      name: name,
+      email: email,
+      createdAt: serverTimestamp()
+    });
+    document.getElementById('newName').value  = '';
+    document.getElementById('newEmail').value = '';
+    toast('✅ تم إضافة '+name,'ok');
+    await loadUsers();
+  } catch(e){
+    toast('❌ خطأ: '+e.message,'err');
+  }
+  btn.disabled = false;
+  btn.innerHTML = '✅ إضافة';
 };
 
-function renderCons() {
-  const b = document.getElementById('consBody');
-  if(!allContractors.length){b.innerHTML=`<tr class="ldrow"><td colspan="5"><div class="empty"><div class="empty-ico">👷</div>لا يوجد مقاولون</div></td></tr>`;return;}
-  b.innerHTML = allContractors.map((c,i)=>{
-    const cnt = allSignals.filter(r=>r.contractor===c.name).length;
-    return `<tr>
-      <td style="color:var(--muted)">${i+1}</td>
-      <td style="font-weight:700">${c.name||'—'}</td>
-      <td style="color:var(--muted);font-size:12px">${c.email||'—'}</td>
-      <td><span class="pill pill-g">${cnt}</span></td>
-      <td><button class="btn btn-d" onclick="delContractor('${c.id}','${c.name}')">🗑 حذف</button></td>
-    </tr>`;
-  }).join('');
-}
-
-window.addContractor = async function() {
-  const name  = document.getElementById('newName').value.trim();
-  const email = document.getElementById('newEmail').value.trim().toLowerCase();
-  if(!name||!email){showToast('أدخل الاسم والإيميل','err');return;}
-  if(!email.includes('@')){showToast('إيميل غير صحيح','err');return;}
-  if(allContractors.find(c=>c.email===email)){showToast('الإيميل موجود بالفعل','err');return;}
-  try {
-    await addDoc(collection(db,'contractors'),{name,email,createdAt:serverTimestamp()});
-    showToast('✅ تمت الإضافة','ok');
-    document.getElementById('newName').value='';
-    document.getElementById('newEmail').value='';
-    await loadContractors();
-    updateStats();
-  } catch(e){showToast('خطأ: '+e.message,'err');}
-};
-
-window.delContractor = async function(id,name) {
-  if(!confirm(`حذف المقاول: ${name}؟`)) return;
+// ── DELETE USER ────────────────────────────────────
+window.delUser = async function(id, name){
+  if(!confirm('هتحذف '+name+'؟')) return;
   try {
     await deleteDoc(doc(db,'contractors',id));
-    showToast('تم الحذف','info');
-    await loadContractors();
-    updateStats();
-  } catch(e){showToast('خطأ: '+e.message,'err');}
-};
-
-// ══════════════════════════════════════
-//  EXPORT EXCEL
-// ══════════════════════════════════════
-window.exportExcel = function() {
-  if(!allSignals.length){showToast('لا توجد بيانات','err');return;}
-  const hdrs = ['#','الاسم','الرقم القومي','النوع','القاطرة حروف','القاطرة أرقام',
-    'انتهاء القاطرة','المقطورة حروف','المقطورة أرقام','انتهاء المقطورة',
-    'المقاول','التاريخ','صورة أمامية','صورة خلفية'];
-  const rows = allSignals.map((r,i)=>[
-    i+1, r.name||'', r.nid||'', r.type||'',
-    r.trk_l||'', r.trk_n||'', r.trk_exp||'',
-    r.trl_l||'', r.trl_n||'', r.trl_exp||'',
-    r.contractor||'', fmtDate(r.createdAt),
-    r.photo0||'', r.photo1||'',
-  ]);
-  const ws = XLSX.utils.aoa_to_sheet([hdrs,...rows]);
-  ws['!cols'] = hdrs.map((_,i)=>({wch:i===1?22:i===2?18:i>=12?30:14}));
-  // تلوين الهيدر
-  const hRange = XLSX.utils.decode_range(ws['!ref']);
-  for(let C=hRange.s.c;C<=hRange.e.c;C++){
-    const addr = XLSX.utils.encode_cell({r:0,c:C});
-    if(!ws[addr]) continue;
-    ws[addr].s = {fill:{fgColor:{rgb:'0F172A'}},font:{color:{rgb:'38BDF8'},bold:true}};
+    toast('تم حذف '+name,'ok');
+    await loadUsers();
+  } catch(e){
+    toast('❌ خطأ: '+e.message,'err');
   }
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'الإشارات');
-  const date = new Date().toISOString().split('T')[0];
-  XLSX.writeFile(wb, `إشارات_${date}.xlsx`);
-  showToast('✅ تم تصدير Excel','ok');
 };
 
-// ══════════════════════════════════════
-//  PHOTOS
-// ══════════════════════════════════════
-window.showPhotos = function(p0,p1) {
-  const el = document.getElementById('modalImgs');
-  const imgs = [p0,p1].filter(Boolean).map(u=>
-    `<img src="${u}" onerror="this.style.display='none'" alt="صورة">`
-  ).join('');
-  el.innerHTML = imgs || '<p style="color:var(--muted);grid-column:1/-1">لا توجد صور</p>';
-  document.getElementById('photoModal').classList.add('on');
-};
-window.closeModal = function() { document.getElementById('photoModal').classList.remove('on'); };
-document.getElementById('photoModal').addEventListener('click',e=>{if(e.target.id==='photoModal')closeModal();});
-
-// ══════════════════════════════════════
-//  HELPERS
-// ══════════════════════════════════════
-function fmtDate(ts) {
-  if(!ts) return '—';
-  const d = ts?.toDate?.() || (ts?.seconds ? new Date(ts.seconds*1000) : new Date(ts));
-  if(isNaN(d)) return '—';
-  return d.toLocaleDateString('ar-EG',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
-}
-function isExp(dateStr) {
-  if(!dateStr) return false;
-  return new Date(dateStr) < new Date();
-}
-function setLoad(id,cols) {
-  document.getElementById(id).innerHTML=`<tr class="ldrow"><td colspan="${cols}"><div class="spin"></div> جاري التحميل…</td></tr>`;
-}
-function setErr(id,cols,msg) {
-  document.getElementById(id).innerHTML=`<tr class="ldrow"><td colspan="${cols}" style="color:var(--err)">⚠️ ${msg}</td></tr>`;
-}
-function showToast(msg,type='info') {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='toast on '+type;
-  setTimeout(()=>t.classList.remove('on'),3500);
+// ── TOAST ──────────────────────────────────────────
+var tt;
+function toast(msg, type){
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show '+(type||'ok');
+  clearTimeout(tt);
+  tt = setTimeout(function(){ el.classList.remove('show'); }, 3000);
 }
 </script>
 </body>
