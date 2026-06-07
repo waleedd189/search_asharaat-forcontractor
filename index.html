@@ -10,6 +10,8 @@
 <meta name="apple-mobile-web-app-title" content="الاشارات">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <title>بحث الاشارات</title>
 <style>
@@ -106,6 +108,10 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
 .quran-title{font-size:16px;font-weight:900;color:#4ade80;display:block;line-height:1.3;font-family:'Cairo',inherit}
 .quran-sub{font-size:11px;color:#166534;display:block;margin-top:3px;font-weight:500}
 
+/* ── ADMIN BUTTON ── */
+.admin-btn{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:7px 14px;color:#fca5a5;font-size:12px;font-weight:700;cursor:pointer;font-family:'Cairo',inherit;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all 0.2s}
+.admin-btn:active{background:rgba(239,68,68,0.22)}
+
 /* ── TOAST ── */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;border-radius:12px;padding:11px 22px;font-size:14px;font-weight:700;z-index:999;transition:transform 0.3s ease;white-space:nowrap;pointer-events:none;font-family:'Cairo',inherit}
 .toast.show{transform:translateX(-50%) translateY(0)}
@@ -172,10 +178,13 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
     </div>
     <div class="header-actions">
       <div class="rtime-top" id="rtEl"></div>
-      <button id="btn-install" onclick="triggerInstall()"
-        style="display:none;background:linear-gradient(135deg,#2563eb,#1d4ed8);border:none;border-radius:10px;padding:8px 16px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Cairo,inherit;display:flex;align-items:center;gap:6px">
-        📲 تثبيت التطبيق
-      </button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="btn-install" onclick="triggerInstall()"
+          style="display:none;background:linear-gradient(135deg,#2563eb,#1d4ed8);border:none;border-radius:10px;padding:7px 14px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Cairo,inherit;align-items:center;gap:5px">
+          📲 تثبيت
+        </button>
+        <a href="tasrih_admin.html" class="admin-btn">🔐 الأدمن</a>
+      </div>
     </div>
   </div>
 
@@ -242,7 +251,7 @@ window.addEventListener('beforeinstallprompt',function(e){
   deferredPrompt=e;
   // أظهر زرار التثبيت
   var btn = document.getElementById('btn-install');
-  if(btn) btn.style.display='flex';
+  if(btn){ btn.style.display='flex'; }
   // أظهر الـ banner
   var dismissed = localStorage.getItem('install-dismissed');
   if(!dismissed || Date.now()-parseInt(dismissed) > 7*24*3600*1000){
@@ -262,8 +271,11 @@ window.addEventListener('appinstalled',function(){
 function triggerInstall(){
   if(deferredPrompt){
     doInstall();
+  } else if(isIos && !isStandalone){
+    // iOS: أظهر التعليمات
+    document.getElementById('iosInstructions').classList.add('show');
+    document.getElementById('iosInstructions').scrollIntoView({behavior:'smooth'});
   } else {
-    // iOS or already installed
     showToast('📲 افتح قائمة المتصفح واختر "إضافة للشاشة الرئيسية"');
   }
 }
@@ -293,10 +305,15 @@ var isStandalone = window.matchMedia('(display-mode: standalone)').matches
   || window.navigator.standalone === true;
 var dismissed = localStorage.getItem('ios-install-dismissed');
 
-if(isIos && !isStandalone && !dismissed){
-  setTimeout(function(){
-    document.getElementById('iosInstructions').classList.add('show');
-  }, 2000);
+if(isIos && !isStandalone){
+  // أظهر زرار التثبيت على iOS دايمًا
+  var iosBtn = document.getElementById('btn-install');
+  if(iosBtn){ iosBtn.style.display='flex'; }
+  if(!dismissed){
+    setTimeout(function(){
+      document.getElementById('iosInstructions').classList.add('show');
+    }, 2000);
+  }
 }
 
 // ── PWA Service Worker ────────────────────
