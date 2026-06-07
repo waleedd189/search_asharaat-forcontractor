@@ -24,6 +24,7 @@ body{background:var(--dark);color:var(--tx);min-height:100vh}
 
 /* LAYOUT */
 #adminApp{display:none}
+#loginScreen{display:flex}
 .topbar{background:rgba(15,23,42,0.97);border-bottom:1px solid var(--brd);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
 .brand{display:flex;align-items:center;gap:12px}
 .brand-ico{width:40px;height:40px;background:linear-gradient(135deg,var(--b),var(--b2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
@@ -82,7 +83,7 @@ td:first-child{color:white;font-weight:600}
 <body>
 
 <!-- LOGIN -->
-<div id="loginScreen">
+<div id="loginScreen" style="display:flex">
   <div class="login-box">
     <div class="login-logo">🛡️</div>
     <div class="login-title">لوحة الأدمن</div>
