@@ -219,7 +219,7 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
     <div class="tab" id="t1" onclick="setField('name',1)">الاسم</div>
     <div class="tab" id="t2" onclick="setField('id',2)">رقم قومي</div>
     <div class="tab" id="t3" onclick="setField('plate',3)">اللوحة</div>
-    <div class="tab" id="t4" onclick="setField('contractor',4)">المقاول</div>
+
   </div>
   <div class="toprow">
     <div class="stats" id="stEl">جاري التحميل...</div>
@@ -421,7 +421,7 @@ function expClass(s){
 
 function setField(f,idx){
   FIELD=f;
-  for(var i=0;i<5;i++){var el=document.getElementById('t'+i);if(el)el.classList.toggle('on',i===idx);}
+  for(var i=0;i<4;i++){var el=document.getElementById('t'+i);if(el)el.classList.toggle('on',i===idx);}
   doSearch();
 }
 
@@ -450,7 +450,6 @@ function doSearch(){
     if(x.id)html+='<div class="card-id-small">'+esc(x.id)+'</div>';
     html+='</div><div class="card-no"># '+esc(x.no)+'</div></div>';
     html+='<div class="field-grid">';
-    html+=fld('المقاول',x.contractor,'');
     html+=fld('القاطرة',x.plate1||x.num1,'');
     html+=fld('انتهاء القاطرة',x.exp1,e1);
     html+=fld('المقطورة',x.plate2||x.num2,'');
