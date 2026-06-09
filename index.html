@@ -10,8 +10,6 @@
 <meta name="apple-mobile-web-app-title" content="الاشارات">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <title>بحث الاشارات</title>
 <style>
@@ -108,6 +106,7 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
 .quran-title{font-size:16px;font-weight:900;color:#4ade80;display:block;line-height:1.3;font-family:'Cairo',inherit}
 .quran-sub{font-size:11px;color:#166534;display:block;margin-top:3px;font-weight:500}
 
+
 /* ── LOGIN SCREEN ── */
 #loginScreen{position:fixed;inset:0;background:#0a0e1a;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
 #loginScreen.hide{display:none}
@@ -122,21 +121,20 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
 .login-btn:disabled{opacity:0.6;cursor:not-allowed}
 .login-err{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:11px;color:#fca5a5;font-size:13px;margin-top:12px;display:none}
 .login-spin{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite}
-.admin-btn{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:7px 14px;color:#fca5a5;font-size:12px;font-weight:700;cursor:pointer;font-family:'Cairo',inherit;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all 0.2s}
-.admin-btn:active{background:rgba(239,68,68,0.22)}
+
+/* ── WELCOME ── */
+.welcome-msg{font-size:12px;font-weight:600;color:#3b82f6;margin-top:3px;display:none}
+.welcome-msg span{color:#4ade80;font-weight:700}
 
 /* ── SIGNATURE ── */
 .signature{text-align:center;padding:10px 10px 4px;font-size:11px;font-weight:300;color:#2d3f57;letter-spacing:0.5px;line-height:1.8}
 .signature .sig-name{color:#4a7ab5;font-weight:400}
-
 /* ── TOAST ── */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;border-radius:12px;padding:11px 22px;font-size:14px;font-weight:700;z-index:999;transition:transform 0.3s ease;white-space:nowrap;pointer-events:none;font-family:'Cairo',inherit}
 .toast.show{transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
-<div class="wrap">
-
 <!-- LOGIN SCREEN -->
 <div id="loginScreen">
   <div class="login-box">
@@ -155,6 +153,8 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
     </div>
   </div>
 </div>
+
+<div class="wrap">
 
   <!-- INSTALL BANNER - Android -->
   <div class="install-banner" id="installBanner">
@@ -196,17 +196,11 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
       <div>
         <div class="app-title">بحث <span>الاشارات</span></div>
         <div class="app-sub">تصاريح النقل الثقيل</div>
+        <div class="welcome-msg" id="welcomeMsg">أهلاً <span id="welcomeName"></span> 👋</div>
       </div>
     </div>
     <div class="header-actions">
       <div class="rtime-top" id="rtEl"></div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button id="btn-install" onclick="triggerInstall()"
-          style="display:none;background:linear-gradient(135deg,#2563eb,#1d4ed8);border:none;border-radius:10px;padding:7px 14px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Cairo,inherit;align-items:center;gap:5px">
-          📲 تثبيت
-        </button>
-
-      </div>
     </div>
   </div>
 
@@ -225,6 +219,7 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
     <div class="tab" id="t1" onclick="setField('name',1)">الاسم</div>
     <div class="tab" id="t2" onclick="setField('id',2)">رقم قومي</div>
     <div class="tab" id="t3" onclick="setField('plate',3)">اللوحة</div>
+    <div class="tab" id="t4" onclick="setField('contractor',4)">المقاول</div>
   </div>
   <div class="toprow">
     <div class="stats" id="stEl">جاري التحميل...</div>
@@ -266,68 +261,6 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
 
 <div class="toast" id="toast"></div>
 
-<!-- Firebase SDK -->
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCmLfaEb7lPCWaqiQLNRsqWUjuTya4xWF0",
-  authDomain: "asharaat-search.firebaseapp.com",
-  projectId: "asharaat-search",
-  storageBucket: "asharaat-search.firebasestorage.app",
-  messagingSenderId: "930583092172",
-  appId: "1:930583092172:web:89aaf88198c3b1d1195b69"
-};
-
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
-
-window.doLogin = async function() {
-  var email = document.getElementById('loginEmail').value.trim().toLowerCase();
-  var errEl = document.getElementById('loginErr');
-  var btn   = document.getElementById('loginBtn');
-
-  errEl.style.display = 'none';
-
-  if(!email || !email.includes('@')){
-    errEl.textContent = '⚠️ أدخل إيميل صحيح';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  // show loading
-  btn.disabled = true;
-  btn.innerHTML = '<span class="login-spin"></span> جاري التحقق...';
-
-  try {
-    var snap = await getDocs(collection(db, 'contractors'));
-    var allowed = snap.docs.map(function(d){ return (d.data().email||'').toLowerCase().trim(); });
-
-    if(allowed.indexOf(email) > -1){
-      // حفظ الجلسة
-      sessionStorage.setItem('auth-email', email);
-      document.getElementById('loginScreen').classList.add('hide');
-    } else {
-      errEl.textContent = '❌ الإيميل ده مش مصرح ليه بالدخول';
-      errEl.style.display = 'block';
-      btn.disabled = false;
-      btn.innerHTML = 'دخول ←';
-    }
-  } catch(e) {
-    errEl.textContent = '❌ خطأ في الاتصال: ' + e.message;
-    errEl.style.display = 'block';
-    btn.disabled = false;
-    btn.innerHTML = 'دخول ←';
-  }
-};
-
-// لو دخل قبل كده في نفس الجلسة
-if(sessionStorage.getItem('auth-email')){
-  document.getElementById('loginScreen').classList.add('hide');
-}
-</script>
-
 <script>
 var DATA=[], FIELD='all';
 var SHEET_ID='1jmUEQg3KeRrUe5weJqFaSMFEc9Ahb8SNSqk1n0iDRnc';
@@ -338,36 +271,16 @@ var deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',function(e){
   e.preventDefault();
   deferredPrompt=e;
-  // أظهر زرار التثبيت
-  var btn = document.getElementById('btn-install');
-  if(btn){ btn.style.display='flex'; }
-  // أظهر الـ banner
-  var dismissed = localStorage.getItem('install-dismissed');
-  if(!dismissed || Date.now()-parseInt(dismissed) > 7*24*3600*1000){
-    setTimeout(function(){
-      document.getElementById('installBanner').classList.add('show');
-    }, 1500);
-  }
+  // اعرض الـ banner بعد ثانيتين
+  setTimeout(function(){
+    document.getElementById('installBanner').classList.add('show');
+  }, 2000);
 });
 
 window.addEventListener('appinstalled',function(){
   document.getElementById('installBanner').classList.remove('show');
-  var btn = document.getElementById('btn-install');
-  if(btn) btn.style.display='none';
   showToast('✅ تم تثبيت التطبيق بنجاح!');
 });
-
-function triggerInstall(){
-  if(deferredPrompt){
-    doInstall();
-  } else if(isIos && !isStandalone){
-    // iOS: أظهر التعليمات
-    document.getElementById('iosInstructions').classList.add('show');
-    document.getElementById('iosInstructions').scrollIntoView({behavior:'smooth'});
-  } else {
-    showToast('📲 افتح قائمة المتصفح واختر "إضافة للشاشة الرئيسية"');
-  }
-}
 
 function doInstall(){
   if(!deferredPrompt) return;
@@ -376,8 +289,6 @@ function doInstall(){
     if(r.outcome==='accepted'){
       showToast('🎉 جاري التثبيت...');
       document.getElementById('installBanner').classList.remove('show');
-      var btn = document.getElementById('btn-install');
-      if(btn) btn.style.display='none';
     }
     deferredPrompt=null;
   });
@@ -394,15 +305,10 @@ var isStandalone = window.matchMedia('(display-mode: standalone)').matches
   || window.navigator.standalone === true;
 var dismissed = localStorage.getItem('ios-install-dismissed');
 
-if(isIos && !isStandalone){
-  // أظهر زرار التثبيت على iOS دايمًا
-  var iosBtn = document.getElementById('btn-install');
-  if(iosBtn){ iosBtn.style.display='flex'; }
-  if(!dismissed){
-    setTimeout(function(){
-      document.getElementById('iosInstructions').classList.add('show');
-    }, 2000);
-  }
+if(isIos && !isStandalone && !dismissed){
+  setTimeout(function(){
+    document.getElementById('iosInstructions').classList.add('show');
+  }, 2000);
 }
 
 // ── PWA Service Worker ────────────────────
@@ -413,6 +319,13 @@ if('serviceWorker' in navigator){
 }
 
 // ── DATA ─────────────────────────────────────
+function drivePreview(url){
+  if(!url) return '';
+  var m=url.match(/file\/d\/([a-zA-Z0-9_-]+)/);
+  if(m) return 'https://drive.google.com/file/d/'+m[1]+'/preview';
+  return url;
+}
+
 function loadData(){
   document.getElementById('loadArea').style.display='block';
   document.getElementById('loadArea').innerHTML='<div class="spinner"></div><br>جاري تحميل البيانات...';
@@ -443,7 +356,7 @@ function parseCSV(text){
       if(c.join(' ').indexOf('\u0627\u0644\u0627\u0633\u0645')>=0||c.join(' ').indexOf('\u0628\u0637\u0627\u0642\u0629')>=0){headerFound=true;}
       continue;
     }
-    while(c.length<16)c.push('');
+    while(c.length<18)c.push('');
     var name=tr(c[1]),id=tr(c[2]);
     if(!name&&!id)continue;
     var n1=tr(c[5]),t1=tr(c[4]),n2=tr(c[8]),t2=tr(c[7]);
@@ -454,7 +367,9 @@ function parseCSV(text){
       contractor:tr(c[10]),start:tr(c[11]),
       end:tr(c[12]),remaining:tr(c[13]),
       plate1:tr(c[14])||(n1&&t1?n1+' '+t1:''),
-      plate2:tr(c[15])||(n2&&t2?n2+' '+t2:'')
+      plate2:tr(c[15])||(n2&&t2?n2+' '+t2:''),
+      url1:tr(c[16])||'',
+      url2:tr(c[17])||''
     });
   }
   return result;
@@ -506,7 +421,7 @@ function expClass(s){
 
 function setField(f,idx){
   FIELD=f;
-  for(var i=0;i<4;i++){var el=document.getElementById('t'+i);if(el)el.classList.toggle('on',i===idx);}
+  for(var i=0;i<5;i++){var el=document.getElementById('t'+i);if(el)el.classList.toggle('on',i===idx);}
   doSearch();
 }
 
@@ -520,7 +435,7 @@ function doSearch(){
   var hits=[];
   for(var i=0;i<DATA.length;i++){
     var x=DATA[i];
-    var src=(FIELD==='name')?x.name:(FIELD==='id')?x.id:(FIELD==='plate')?(x.plate1+x.plate2+x.num1+x.num2):(x.name+x.id+x.plate1+x.plate2+x.num1+x.num2);
+    var src=(FIELD==='name')?x.name:(FIELD==='id')?x.id:(FIELD==='plate')?(x.plate1+x.plate2+x.num1+x.num2):(FIELD==='contractor')?x.contractor:(x.name+x.id+x.contractor+x.plate1+x.plate2+x.num1+x.num2);
     if(src.indexOf(q)>=0)hits.push(i);
   }
   stEl.textContent='نتائج: '+hits.length+' سجل';
@@ -535,6 +450,7 @@ function doSearch(){
     if(x.id)html+='<div class="card-id-small">'+esc(x.id)+'</div>';
     html+='</div><div class="card-no"># '+esc(x.no)+'</div></div>';
     html+='<div class="field-grid">';
+    html+=fld('المقاول',x.contractor,'');
     html+=fld('القاطرة',x.plate1||x.num1,'');
     html+=fld('انتهاء القاطرة',x.exp1,e1);
     html+=fld('المقطورة',x.plate2||x.num2,'');
@@ -549,6 +465,10 @@ function doSearch(){
     if(ps==='danger')b+='<span class="badge br">⚠ الإشارة منتهية</span>';
     else if(ps==='warn')b+='<span class="badge ba">⏰ الإشارة قريبة الانتهاء</span>';
     if(b)html+='<div class="badge-row">'+b+'</div>';
+    var permits='';
+    if(x.url1) permits+='<a href="'+drivePreview(x.url1)+'" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#0f2744;border:1px solid #1e3a5f;color:#60a5fa;padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;text-decoration:none">📄 إشارة كلينكر</a> ';
+    if(x.url2) permits+='<a href="'+drivePreview(x.url2)+'" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#061a0d;border:1px solid #14532d;color:#4ade80;padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;text-decoration:none">📄 إشارة فحم</a>';
+    if(permits) html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid #1a2535">'+permits+'</div>';
     html+='</div>';
   }
   if(hits.length>50)html+='<div class="empty" style="padding:14px">يعرض أول 50 من '+hits.length+'</div>';
@@ -571,6 +491,82 @@ function showToast(msg){
 document.getElementById('qInput').addEventListener('input',doSearch);
 setInterval(loadData,30*60*1000);
 loadData();
+</script>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCmLfaEb7lPCWaqiQLNRsqWUjuTya4xWF0",
+  authDomain: "asharaat-search.firebaseapp.com",
+  projectId: "asharaat-search",
+  storageBucket: "asharaat-search.firebasestorage.app",
+  messagingSenderId: "930583092172",
+  appId: "1:930583092172:web:89aaf88198c3b1d1195b69"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+function showWelcome(name) {
+  var msg  = document.getElementById('welcomeMsg');
+  var span = document.getElementById('welcomeName');
+  if(msg && span) {
+    span.textContent = name;
+    msg.style.display = 'block';
+  }
+}
+
+window.doLogin = async function() {
+  var email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  var errEl = document.getElementById('loginErr');
+  var btn   = document.getElementById('loginBtn');
+
+  errEl.style.display = 'none';
+
+  if(!email || !email.includes('@')){
+    errEl.textContent = '⚠️ أدخل إيميل صحيح';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="login-spin"></span> جاري التحقق...';
+
+  try {
+    var snap = await getDocs(collection(db, 'contractors'));
+    var match = snap.docs.find(function(d){
+      return (d.data().email||'').toLowerCase().trim() === email;
+    });
+
+    if(match){
+      var userName = match.data().name || email;
+      sessionStorage.setItem('auth-email', email);
+      sessionStorage.setItem('auth-name', userName);
+      document.getElementById('loginScreen').classList.add('hide');
+      showWelcome(userName);
+    } else {
+      errEl.textContent = '❌ الإيميل ده مش مصرح ليه بالدخول';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = 'دخول ←';
+    }
+  } catch(e) {
+    errEl.textContent = '❌ خطأ في الاتصال: ' + e.message;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = 'دخول ←';
+  }
+};
+
+// لو دخل قبل كده في نفس الجلسة
+if(sessionStorage.getItem('auth-email')){
+  document.getElementById('loginScreen').classList.add('hide');
+  var savedName = sessionStorage.getItem('auth-name') || sessionStorage.getItem('auth-email');
+  showWelcome(savedName);
+}
 </script>
 </body>
 </html>
