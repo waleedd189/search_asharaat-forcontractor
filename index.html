@@ -495,7 +495,8 @@ loadData();
 <!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, onSnapshot }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCmLfaEb7lPCWaqiQLNRsqWUjuTya4xWF0",
@@ -508,15 +509,37 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
+var currentSessionId = null;
 
 function showWelcome(name) {
   var msg  = document.getElementById('welcomeMsg');
   var span = document.getElementById('welcomeName');
-  if(msg && span) {
-    span.textContent = name;
-    msg.style.display = 'block';
-  }
+  if(msg && span){ span.textContent = name; msg.style.display = 'block'; }
 }
+
+// مراقبة الـ session — لو الأدمن طرده أو session اتمسحت
+function watchSession(sessionId) {
+  var ref = doc(db, 'sessions', sessionId);
+  onSnapshot(ref, function(snap){
+    if(!snap.exists()){
+      // الـ session اتمسحت — أظهر رسالة وأرجعه للوجن
+      sessionStorage.clear();
+      alert('⚠️ تم إنهاء جلستك. يرجى تسجيل الدخول مرة أخرى.');
+      location.reload();
+    }
+  });
+}
+
+// امسح الـ session لما يقفل الصفحة
+window.addEventListener('beforeunload', function(){
+  if(currentSessionId){
+    // beacon لضمان الإرسال قبل الإغلاق
+    var url = 'https://firestore.googleapis.com/v1/projects/asharaat-search/databases/(default)/documents/sessions/'+currentSessionId;
+    navigator.sendBeacon(url);
+    // fallback
+    deleteDoc(doc(db,'sessions',currentSessionId)).catch(function(){});
+  }
+});
 
 window.doLogin = async function() {
   var email = document.getElementById('loginEmail').value.trim().toLowerCase();
@@ -540,23 +563,46 @@ window.doLogin = async function() {
       return (d.data().email||'').toLowerCase().trim() === email;
     });
 
-    if(match && match.data().perm_page1 !== false){
-      var userName = match.data().name || email;
-      sessionStorage.setItem('auth-email', email);
-      sessionStorage.setItem('auth-name', userName);
-      document.getElementById('loginScreen').classList.add('hide');
-      showWelcome(userName);
-    } else if(match){
-      errEl.textContent = '❌ مش مصرح ليك بالدخول لهذه الصفحة';
-      errEl.style.display = 'block';
-      btn.disabled = false;
-      btn.innerHTML = 'دخول ←';
-    } else {
+    if(!match){
       errEl.textContent = '❌ الإيميل ده مش موجود في النظام';
       errEl.style.display = 'block';
-      btn.disabled = false;
-      btn.innerHTML = 'دخول ←';
+      btn.disabled = false; btn.innerHTML = 'دخول ←'; return;
     }
+    if(match.data().perm_page1 === false){
+      errEl.textContent = '❌ مش مصرح ليك بالدخول لهذه الصفحة';
+      errEl.style.display = 'block';
+      btn.disabled = false; btn.innerHTML = 'دخول ←'; return;
+    }
+
+    // تحقق لو في session موجودة لنفس الإيميل
+    var sessSnap = await getDocs(collection(db, 'sessions'));
+    var existing = sessSnap.docs.find(function(d){
+      return (d.data().email||'').toLowerCase() === email;
+    });
+    if(existing){
+      errEl.textContent = '⚠️ الإيميل ده شغال على جهاز تاني دلوقتي';
+      errEl.style.display = 'block';
+      btn.disabled = false; btn.innerHTML = 'دخول ←'; return;
+    }
+
+    // سجل الـ session
+    var userName = match.data().name || email;
+    var sessionId = email.replace(/[^a-z0-9]/g,'_') + '_' + Date.now();
+    await setDoc(doc(db,'sessions',sessionId), {
+      email: email,
+      name: userName,
+      page: 'contractor',
+      loginAt: new Date()
+    });
+    currentSessionId = sessionId;
+
+    sessionStorage.setItem('auth-email', email);
+    sessionStorage.setItem('auth-name', userName);
+    sessionStorage.setItem('auth-session-id', sessionId);
+    document.getElementById('loginScreen').classList.add('hide');
+    showWelcome(userName);
+    watchSession(sessionId);
+
   } catch(e) {
     errEl.textContent = '❌ خطأ في الاتصال: ' + e.message;
     errEl.style.display = 'block';
@@ -566,10 +612,14 @@ window.doLogin = async function() {
 };
 
 // لو دخل قبل كده في نفس الجلسة
-if(sessionStorage.getItem('auth-email')){
+var savedEmail   = sessionStorage.getItem('auth-email');
+var savedName    = sessionStorage.getItem('auth-name');
+var savedSession = sessionStorage.getItem('auth-session-id');
+if(savedEmail && savedSession){
+  currentSessionId = savedSession;
   document.getElementById('loginScreen').classList.add('hide');
-  var savedName = sessionStorage.getItem('auth-name') || sessionStorage.getItem('auth-email');
-  showWelcome(savedName);
+  showWelcome(savedName || savedEmail);
+  watchSession(savedSession);
 }
 </script>
 </body>
