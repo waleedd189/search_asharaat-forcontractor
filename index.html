@@ -130,6 +130,10 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
 .signature{text-align:center;padding:10px 10px 4px;font-size:11px;font-weight:300;color:#2d3f57;letter-spacing:0.5px;line-height:1.8}
 .signature .sig-name{color:#4a7ab5;font-weight:400}
 /* ── TOAST ── */
+/* -- LOGOUT BTN -- */
+.btn-logout-user{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#fca5a5;border-radius:8px;padding:6px 14px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn-logout-user:hover{background:rgba(239,68,68,0.2)}
+
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;border-radius:12px;padding:11px 22px;font-size:14px;font-weight:700;z-index:999;transition:transform 0.3s ease;white-space:nowrap;pointer-events:none;font-family:'Cairo',inherit}
 .toast.show{transform:translateX(-50%) translateY(0)}
 </style>
@@ -201,6 +205,7 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
     </div>
     <div class="header-actions">
       <div class="rtime-top" id="rtEl"></div>
+      <button class="btn-logout-user" onclick="doLogout()">خروج</button>
     </div>
   </div>
 
@@ -576,9 +581,19 @@ window.doLogin = async function() {
 
     // تحقق لو في session موجودة لنفس الإيميل
     var sessSnap = await getDocs(collection(db, 'sessions'));
-    var existing = sessSnap.docs.find(function(d){
-      return (d.data().email||'').toLowerCase() === email;
-    });
+    var now = Date.now();
+    var existing = null;
+    // امسح الـ sessions القديمة (أكتر من 8 ساعات) تلقائياً
+    for(var sd of sessSnap.docs){
+      var sdata = sd.data();
+      var loginTime = sdata.loginAt ? (sdata.loginAt.toDate ? sdata.loginAt.toDate().getTime() : new Date(sdata.loginAt).getTime()) : 0;
+      var ageHours = (now - loginTime) / 3600000;
+      if(ageHours > 8){
+        await deleteDoc(doc(db,'sessions',sd.id)); // session قديمة - امسحها
+        continue;
+      }
+      if((sdata.email||'').toLowerCase() === email) existing = sd;
+    }
     if(existing){
       errEl.textContent = '⚠️ الإيميل ده شغال على جهاز تاني دلوقتي';
       errEl.style.display = 'block';
@@ -621,6 +636,15 @@ if(savedEmail && savedSession){
   showWelcome(savedName || savedEmail);
   watchSession(savedSession);
 }
+
+window.doLogout = async function(){
+  var sid = sessionStorage.getItem('auth-session-id');
+  if(sid){
+    try{ await deleteDoc(doc(db,'sessions',sid)); }catch(e){}
+  }
+  sessionStorage.clear();
+  location.reload();
+};
 </script>
 </body>
 </html>
