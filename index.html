@@ -540,14 +540,19 @@ window.doLogin = async function() {
       return (d.data().email||'').toLowerCase().trim() === email;
     });
 
-    if(match){
+    if(match && match.data().perm_page1 !== false){
       var userName = match.data().name || email;
       sessionStorage.setItem('auth-email', email);
       sessionStorage.setItem('auth-name', userName);
       document.getElementById('loginScreen').classList.add('hide');
       showWelcome(userName);
+    } else if(match){
+      errEl.textContent = '❌ مش مصرح ليك بالدخول لهذه الصفحة';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = 'دخول ←';
     } else {
-      errEl.textContent = '❌ الإيميل ده مش مصرح ليه بالدخول';
+      errEl.textContent = '❌ الإيميل ده مش موجود في النظام';
       errEl.style.display = 'block';
       btn.disabled = false;
       btn.innerHTML = 'دخول ←';
