@@ -353,16 +353,19 @@ function parseCSV(text){
     }
     while(c.length<18)c.push('');
     var name=tr(c[1]),id=tr(c[2]);
-    if(!name&&!id)continue;
     var n1=tr(c[5]),t1=tr(c[4]),n2=tr(c[8]),t2=tr(c[7]);
+    var plate1v=tr(c[14])||(n1&&t1?n1+' '+t1:'');
+    var plate2v=tr(c[15])||(n2&&t2?n2+' '+t2:'');
+    var hasAny = name||id||plate1v||plate2v||n1||n2||tr(c[10])||tr(c[11])||tr(c[12]);
+    if(!hasAny)continue;
     result.push({
       no:tr(c[0]),name:name,id:id,
       train1:t1,num1:n1,exp1:tr(c[6]),
       train2:t2,num2:n2,exp2:tr(c[9]),
       contractor:tr(c[10]),start:tr(c[11]),
       end:tr(c[12]),remaining:tr(c[13]),
-      plate1:tr(c[14])||(n1&&t1?n1+' '+t1:''),
-      plate2:tr(c[15])||(n2&&t2?n2+' '+t2:''),
+      plate1:plate1v,
+      plate2:plate2v,
       url1:tr(c[16])||'',
       url2:tr(c[17])||''
     });
