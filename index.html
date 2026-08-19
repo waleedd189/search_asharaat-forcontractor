@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
@@ -276,10 +277,35 @@ if(isIos && !isStandalone && !dismissed){
     document.getElementById('iosInstructions').classList.add('show');
   }, 2000);
 }
-// ── PWA Service Worker ────────────────────
+// ── PWA Service Worker (Network-First لتحديثات فورية) ────────
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js').catch(function(){});
+    navigator.serviceWorker.register('sw.js').then(function(reg){
+      // كل ما نفتح الصفحة نتأكد إن مفيش تحديث
+      reg.update();
+      // لو لقى تحديث جديد
+      reg.addEventListener('updatefound', function(){
+        var newSW = reg.installing;
+        newSW.addEventListener('statechange', function(){
+          if(newSW.state === 'installed' && navigator.serviceWorker.controller){
+            // فيه نسخة جديدة جاهزة — اعرض تنبيه للمستخدم
+            if(confirm('🎉 فيه تحديث جديد للتطبيق!\nاضغط OK للتحديث فوراً')){
+              newSW.postMessage({action: 'skipWaiting'});
+              window.location.reload();
+            }
+          }
+        });
+      });
+    }).catch(function(err){
+      console.warn('SW register failed:', err);
+    });
+    // لو الـ SW اتفعل، رفريش تلقائى
+    var refreshing;
+    navigator.serviceWorker.addEventListener('controllerchange', function(){
+      if(refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    });
   });
 }
 // ── DATA ─────────────────────────────────────
@@ -540,17 +566,37 @@ window.doLogin = async function() {
     }
     var userName = match.data().name || email;
 
-    // ── قفل الجلسة الواحدة ──
+    // ── منع الدخول لو فيه جلسة نشطة بالفعل ──
+    var IDLE_THRESHOLD = 30000; // 30 ثانية = يعتبر مهجور
+    var currentSession = match.data().active_session;
+    var lastSeen = match.data().last_seen || 0;
+    var age = Date.now() - lastSeen;
+
+    if(currentSession && age < IDLE_THRESHOLD){
+      var waitSec = Math.ceil((IDLE_THRESHOLD - age) / 1000);
+      errEl.innerHTML = '🚫 الإيميل ده مستخدم حالياً من جهاز آخر<br>' +
+                        '<span style="font-size:11px;color:#94a3b8">لو الجهاز التانى مقفول، حاول تانى بعد '+ waitSec +' ثانية</span>';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = 'دخول ←';
+      return;
+    }
+
+    // ── تسجيل الجلسة الجديدة ──
     var sessionId = newSessionId();
     try {
       await updateDoc(doc(db, 'contractors', match.id), {
         active_session: sessionId,
         last_seen: Date.now()
       });
-      console.log('[session-lock] ✅ session ID كتبت بنجاح:', sessionId);
+      console.log('[session-lock] ✅ دخول ناجح، session:', sessionId);
     } catch(e){
       console.error('[session-lock] ❌ فشل حفظ الـ session ID:', e.code, e.message);
-      alert('⚠️ تحذير: قفل الجلسة الواحدة مش شغّال\n\nالسبب: '+e.code+'\n\nراجع Firestore Security Rules');
+      errEl.textContent = '❌ خطأ فى تسجيل الجلسة: ' + e.code;
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = 'دخول ←';
+      return;
     }
 
     sessionStorage.setItem('auth-email', email);
@@ -589,13 +635,18 @@ var savedName  = sessionStorage.getItem('auth-name');
 var savedDocId = sessionStorage.getItem('auth-docid');
 var savedSid   = sessionStorage.getItem('auth-sid');
 if(savedEmail){
-  document.getElementById('loginScreen').classList.add('hide');
-  showWelcome(savedName || savedEmail);
   if(savedDocId && savedSid){
+    // جلسة عادية مع قفل نشط
+    document.getElementById('loginScreen').classList.add('hide');
+    showWelcome(savedName || savedEmail);
     startHeartbeat(savedDocId, savedSid);
+  } else {
+    // جلسة قديمة من قبل تفعيل القفل — امسحها وخليه يسجل من جديد
+    console.warn('[session-lock] جلسة قديمة بدون session ID — إعادة تسجيل مطلوبة');
+    sessionStorage.clear();
+    // شاشة الدخول ظاهرة افتراضياً
   }
 }
 </script>
 </body>
 </html>
-
