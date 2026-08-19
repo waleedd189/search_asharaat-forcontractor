@@ -484,6 +484,7 @@ function startHeartbeat(docId, sessionId){
       var snap = await getDoc(doc(db, 'contractors', docId));
       if(!snap.exists()) return;
       var current = snap.data().active_session;
+      console.log('[session-lock] فحص: current=', current, 'my=', sessionId);
       if(current && current !== sessionId){
         clearInterval(heartbeatTimer);
         heartbeatTimer = null;
@@ -491,12 +492,14 @@ function startHeartbeat(docId, sessionId){
         alert('⚠️ تم تسجيل الدخول بإيميلك من جهاز آخر\nتم إنهاء جلستك تلقائياً');
         location.reload();
       } else {
-        await updateDoc(doc(db, 'contractors', docId), { last_seen: Date.now() });
+        try {
+          await updateDoc(doc(db, 'contractors', docId), { last_seen: Date.now() });
+        } catch(err){ console.warn('[session-lock] فشل تحديث last_seen:', err.code); }
       }
-    } catch(e) { /* تجاهل الأخطاء المؤقتة */ }
+    } catch(e) { console.warn('[session-lock] فشل الفحص:', e.code); }
   };
-  setTimeout(doCheck, 5000);
-  heartbeatTimer = setInterval(doCheck, 20000);
+  setTimeout(doCheck, 3000);
+  heartbeatTimer = setInterval(doCheck, 15000);
 }
 
 function stopHeartbeat(){
@@ -544,7 +547,11 @@ window.doLogin = async function() {
         active_session: sessionId,
         last_seen: Date.now()
       });
-    } catch(e){ /* غير مميت */ }
+      console.log('[session-lock] ✅ session ID كتبت بنجاح:', sessionId);
+    } catch(e){
+      console.error('[session-lock] ❌ فشل حفظ الـ session ID:', e.code, e.message);
+      alert('⚠️ تحذير: قفل الجلسة الواحدة مش شغّال\n\nالسبب: '+e.code+'\n\nراجع Firestore Security Rules');
+    }
 
     sessionStorage.setItem('auth-email', email);
     sessionStorage.setItem('auth-name', userName);
