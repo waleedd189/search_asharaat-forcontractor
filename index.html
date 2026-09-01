@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
@@ -116,6 +115,19 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
 /* ── TOAST ── */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;border-radius:12px;padding:11px 22px;font-size:14px;font-weight:700;z-index:999;transition:transform 0.3s ease;white-space:nowrap;pointer-events:none;font-family:'Cairo',inherit}
 .toast.show{transform:translateX(-50%) translateY(0)}
+/* ── ADMIN NOTIFICATION MODAL ── */
+.notif-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);animation:fadeIn .3s}
+.notif-overlay.show{display:flex}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes popIn{from{transform:scale(0.7);opacity:0}to{transform:scale(1);opacity:1}}
+.notif-card{background:linear-gradient(135deg,#1e3a5f,#0f2744);border:2px solid #3b82f6;border-radius:24px;padding:28px 24px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(59,130,246,0.4);animation:popIn .4s cubic-bezier(0.34,1.56,0.64,1)}
+.notif-emoji{font-size:64px;margin-bottom:14px;animation:bell 1s ease-in-out infinite}
+@keyframes bell{0%,100%{transform:rotate(0)}25%{transform:rotate(-15deg)}75%{transform:rotate(15deg)}}
+.notif-title{font-size:22px;font-weight:900;color:#fff;margin-bottom:10px}
+.notif-msg{font-size:16px;color:#dbeafe;line-height:1.7;margin-bottom:8px;white-space:pre-wrap}
+.notif-time{font-size:12px;color:#93c5fd;margin-bottom:20px}
+.notif-btn{background:linear-gradient(135deg,#2563eb,#1d4ed8);border:none;border-radius:14px;padding:14px 40px;color:#fff;font-family:'Cairo',sans-serif;font-size:16px;font-weight:800;cursor:pointer;transition:.2s;box-shadow:0 4px 20px rgba(37,99,235,0.4)}
+.notif-btn:active{transform:scale(0.96)}
 </style>
 </head>
 <body>
@@ -234,6 +246,16 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
   Search Asharaat-forcontractor © 2026 🚛 | Sky Ports<br>
   Developed by <span class="sig-name">Waleed Salah</span>
 </div>
+<!-- ADMIN NOTIFICATION MODAL -->
+<div class="notif-overlay" id="notifOverlay">
+  <div class="notif-card">
+    <div class="notif-emoji" id="notifEmoji">🔔</div>
+    <div class="notif-title">إشعار جديد!</div>
+    <div class="notif-msg" id="notifMsg"></div>
+    <div class="notif-time" id="notifTime"></div>
+    <button class="notif-btn" onclick="closeNotif()">تمام ✓</button>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 <script>
 var DATA=[], FIELD='all';
@@ -277,15 +299,18 @@ if(isIos && !isStandalone && !dismissed){
     document.getElementById('iosInstructions').classList.add('show');
   }, 2000);
 }
-// ── PWA Service Worker ────────
+// ── PWA Service Worker (Network-First لتحديثات فورية) ────────
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
     navigator.serviceWorker.register('sw.js').then(function(reg){
+      // كل ما نفتح الصفحة نتأكد إن مفيش تحديث
       reg.update();
+      // لو لقى تحديث جديد
       reg.addEventListener('updatefound', function(){
         var newSW = reg.installing;
         newSW.addEventListener('statechange', function(){
           if(newSW.state === 'installed' && navigator.serviceWorker.controller){
+            // فيه نسخة جديدة جاهزة — اعرض تنبيه للمستخدم
             if(confirm('🎉 فيه تحديث جديد للتطبيق!\nاضغط OK للتحديث فوراً')){
               newSW.postMessage({action: 'skipWaiting'});
               window.location.reload();
@@ -296,6 +321,7 @@ if('serviceWorker' in navigator){
     }).catch(function(err){
       console.warn('SW register failed:', err);
     });
+    // لو الـ SW اتفعل، رفريش تلقائى
     var refreshing;
     navigator.serviceWorker.addEventListener('controllerchange', function(){
       if(refreshing) return;
@@ -340,7 +366,7 @@ function parseCSV(text){
       if(c.join(' ').indexOf('الاسم')>=0||c.join(' ').indexOf('بطاقة')>=0){headerFound=true;}
       continue;
     }
-    while(c.length<19)c.push('');
+    while(c.length<18)c.push('');
     var name=tr(c[1]),id=tr(c[2]);
     var n1=tr(c[5]),t1=tr(c[4]),n2=tr(c[8]),t2=tr(c[7]);
     var plate1v=tr(c[14])||(n1&&t1?n1+' '+t1:'');
@@ -356,8 +382,7 @@ function parseCSV(text){
       plate1:plate1v,
       plate2:plate2v,
       url1:tr(c[16])||'',
-      url2:tr(c[17])||'',
-      url3:tr(c[18])||''
+      url2:tr(c[17])||''
     });
   }
   return result;
@@ -448,9 +473,8 @@ function doSearch(){
     else if(ps==='warn')b+='<span class="badge ba">⏰ الإشارة قريبة الانتهاء</span>';
     if(b)html+='<div class="badge-row">'+b+'</div>';
     var permits='';
-    if(x.url1) permits+='<a href="'+drivePreview(x.url1)+'" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#0f2744;border:1px solid #1e3a5f;color:#60a5fa;padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;text-decoration:none">📄 إشارة كلينكر معدية</a>';
-    if(x.url2) permits+='<a href="'+drivePreview(x.url2)+'" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#061a0d;border:1px solid #14532d;color:#4ade80;padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;text-decoration:none">📄 إشارة فحم معدية</a>';
-    if(x.url3) permits+='<a href="'+drivePreview(x.url3)+'" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#2c1500;border:1px solid #451a03;color:#fb923c;padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;text-decoration:none">📄 إشارة كلينكر نفق</a>';
+    if(x.url1) permits+='<a href="'+drivePreview(x.url1)+'" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#0f2744;border:1px solid #1e3a5f;color:#60a5fa;padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;text-decoration:none">📄 إشارة كلينكر</a> ';
+    if(x.url2) permits+='<a href="'+drivePreview(x.url2)+'" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#061a0d;border:1px solid #14532d;color:#4ade80;padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;text-decoration:none">📄 إشارة فحم</a>';
     if(permits) html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid #1a2535">'+permits+'</div>';
     html+='</div>';
   }
@@ -475,7 +499,7 @@ loadData();
 <!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, collection, getDocs, doc, getDoc, updateDoc }
+import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, onSnapshot }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 const firebaseConfig = {
   apiKey: "AIzaSyCmLfaEb7lPCWaqiQLNRsqWUjuTya4xWF0",
@@ -565,7 +589,7 @@ window.doLogin = async function() {
     var userName = match.data().name || email;
 
     // ── منع الدخول لو فيه جلسة نشطة بالفعل ──
-    var IDLE_THRESHOLD = 30000;
+    var IDLE_THRESHOLD = 30000; // 30 ثانية = يعتبر مهجور
     var currentSession = match.data().active_session;
     var lastSeen = match.data().last_seen || 0;
     var age = Date.now() - lastSeen;
@@ -604,6 +628,7 @@ window.doLogin = async function() {
     document.getElementById('loginScreen').classList.add('hide');
     showWelcome(userName);
     startHeartbeat(match.id, sessionId);
+    startNotifListener();
   } catch(e) {
     errEl.textContent = '❌ خطأ في الاتصال: ' + e.message;
     errEl.style.display = 'block';
@@ -627,6 +652,62 @@ window.doLogout = async function(){
   sessionStorage.clear();
   location.reload();
 };
+// ── إشعارات الأدمن (صوت + اهتزاز + بانر) ───────
+function playNotifSound(){
+  try {
+    var Ctx = window.AudioContext || window.webkitAudioContext;
+    if(!Ctx) return;
+    var ctx = new Ctx();
+    var notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+    notes.forEach(function(freq, i){
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      osc.type = 'sine';
+      var start = ctx.currentTime + i * 0.13;
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(0.35, start + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.45);
+      osc.start(start);
+      osc.stop(start + 0.5);
+    });
+  } catch(e){}
+}
+
+window.closeNotif = function(){
+  document.getElementById('notifOverlay').classList.remove('show');
+};
+
+function showAdminNotif(msg, timestamp){
+  document.getElementById('notifMsg').textContent = msg;
+  var t = new Date(timestamp);
+  document.getElementById('notifTime').textContent = t.toLocaleString('ar-EG');
+  document.getElementById('notifOverlay').classList.add('show');
+  playNotifSound();
+  if(navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 500]);
+}
+
+function startNotifListener(){
+  onSnapshot(doc(db, 'notifications', 'latest'), function(snap){
+    if(!snap.exists()) return;
+    var data = snap.data();
+    if(!data.createdAt || !data.message) return;
+    var lastSeen = parseInt(localStorage.getItem('notif-last-seen') || '0');
+    if(data.createdAt <= lastSeen) return; // اتشاف قبل كده
+    // أول مرة التطبيق يفتح — سجل الحالى بدون تنبيه
+    if(lastSeen === 0){
+      localStorage.setItem('notif-last-seen', String(data.createdAt));
+      return;
+    }
+    showAdminNotif(data.message, data.createdAt);
+    localStorage.setItem('notif-last-seen', String(data.createdAt));
+  }, function(err){
+    console.warn('[notif-listener] error:', err.code);
+  });
+}
+
 // ── لو دخل قبل كده في نفس الجلسة ─────────────
 var savedEmail = sessionStorage.getItem('auth-email');
 var savedName  = sessionStorage.getItem('auth-name');
@@ -634,14 +715,19 @@ var savedDocId = sessionStorage.getItem('auth-docid');
 var savedSid   = sessionStorage.getItem('auth-sid');
 if(savedEmail){
   if(savedDocId && savedSid){
+    // جلسة عادية مع قفل نشط
     document.getElementById('loginScreen').classList.add('hide');
     showWelcome(savedName || savedEmail);
     startHeartbeat(savedDocId, savedSid);
+    startNotifListener();
   } else {
+    // جلسة قديمة من قبل تفعيل القفل — امسحها وخليه يسجل من جديد
     console.warn('[session-lock] جلسة قديمة بدون session ID — إعادة تسجيل مطلوبة');
     sessionStorage.clear();
+    // شاشة الدخول ظاهرة افتراضياً
   }
 }
 </script>
 </body>
 </html>
+
