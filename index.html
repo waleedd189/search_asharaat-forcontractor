@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
@@ -60,6 +61,11 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
 .bg{background:#052e16;color:#4ade80;border:1px solid #14532d}
 .ba{background:#2c1500;color:#fb923c;border:1px solid #451a03}
 .br{background:#200a0a;color:#f87171;border:1px solid #450a0a}
+/* ── PERMIT BUTTONS ── */
+.permit-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;text-decoration:none;border:1px solid}
+.permit-1{background:#0f2744;border-color:#1e3a5f;color:#60a5fa}
+.permit-2{background:#061a0d;border-color:#14532d;color:#4ade80}
+.permit-3{background:#2c1500;border-color:#451a03;color:#fb923c}
 /* ── INSTALL BANNER ── */
 .install-banner{background:linear-gradient(135deg,#1e3a5f,#1e40af);border:1px solid #3b82f6;border-radius:16px;padding:16px;margin-bottom:14px;display:none;animation:slideDown .4s ease}
 .install-banner.show{display:block}
@@ -249,10 +255,10 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
 <!-- ADMIN NOTIFICATION MODAL -->
 <div class="notif-overlay" id="notifOverlay">
   <div class="notif-card">
-    <div class="notif-emoji" id="notifEmoji">🔔</div>
+    <div class="notif-emoji">🔔</div>
     <div class="notif-title">إشعار جديد!</div>
-    <div class="notif-msg" id="notifMsg"></div>
-    <div class="notif-time" id="notifTime"></div>
+    <div class="notif-msg" id="notifMsgEl"></div>
+    <div class="notif-time" id="notifTimeEl"></div>
     <button class="notif-btn" onclick="closeNotif()">تمام ✓</button>
   </div>
 </div>
@@ -262,6 +268,15 @@ var DATA=[], FIELD='all';
 var SHEET_ID='1jmUEQg3KeRrUe5weJqFaSMFEc9Ahb8SNSqk1n0iDRnc';
 var GID='477351139';
 var deferredPrompt=null;
+
+/* أسماء أعمدة الروابط — بتتقرأ من الشيت (صف الهيدر)
+   لو العمود فاضى فى الهيدر بيستخدم الاسم الافتراضى اللى تحت */
+var HEADERS = {
+  url1: 'إشارة كلينكر',   // العمود Q (index 16)
+  url2: 'إشارة فحم',      // العمود R (index 17)
+  url3: 'إشارة 3'         // العمود S (index 18)
+};
+
 // ── PWA ──────────────────────────────────────
 window.addEventListener('beforeinstallprompt',function(e){
   e.preventDefault();
@@ -299,18 +314,15 @@ if(isIos && !isStandalone && !dismissed){
     document.getElementById('iosInstructions').classList.add('show');
   }, 2000);
 }
-// ── PWA Service Worker (Network-First لتحديثات فورية) ────────
+// ── PWA Service Worker ─────────────────────
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
     navigator.serviceWorker.register('sw.js').then(function(reg){
-      // كل ما نفتح الصفحة نتأكد إن مفيش تحديث
       reg.update();
-      // لو لقى تحديث جديد
       reg.addEventListener('updatefound', function(){
         var newSW = reg.installing;
         newSW.addEventListener('statechange', function(){
           if(newSW.state === 'installed' && navigator.serviceWorker.controller){
-            // فيه نسخة جديدة جاهزة — اعرض تنبيه للمستخدم
             if(confirm('🎉 فيه تحديث جديد للتطبيق!\nاضغط OK للتحديث فوراً')){
               newSW.postMessage({action: 'skipWaiting'});
               window.location.reload();
@@ -318,10 +330,7 @@ if('serviceWorker' in navigator){
           }
         });
       });
-    }).catch(function(err){
-      console.warn('SW register failed:', err);
-    });
-    // لو الـ SW اتفعل، رفريش تلقائى
+    }).catch(function(err){ console.warn('SW register failed:', err); });
     var refreshing;
     navigator.serviceWorker.addEventListener('controllerchange', function(){
       if(refreshing) return;
@@ -363,10 +372,17 @@ function parseCSV(text){
     var c=splitLine(lines[i]);
     if(!c||c.length<3)continue;
     if(!headerFound){
-      if(c.join(' ').indexOf('الاسم')>=0||c.join(' ').indexOf('بطاقة')>=0){headerFound=true;}
+      if(c.join(' ').indexOf('الاسم')>=0||c.join(' ').indexOf('بطاقة')>=0){
+        headerFound=true;
+        // إقرأ أسماء الأعمدة Q R S من صف الهيدر
+        var h1=tr(c[16]||''), h2=tr(c[17]||''), h3=tr(c[18]||'');
+        if(h1) HEADERS.url1 = h1;
+        if(h2) HEADERS.url2 = h2;
+        if(h3) HEADERS.url3 = h3;
+      }
       continue;
     }
-    while(c.length<18)c.push('');
+    while(c.length<19)c.push('');
     var name=tr(c[1]),id=tr(c[2]);
     var n1=tr(c[5]),t1=tr(c[4]),n2=tr(c[8]),t2=tr(c[7]);
     var plate1v=tr(c[14])||(n1&&t1?n1+' '+t1:'');
@@ -382,7 +398,8 @@ function parseCSV(text){
       plate1:plate1v,
       plate2:plate2v,
       url1:tr(c[16])||'',
-      url2:tr(c[17])||''
+      url2:tr(c[17])||'',
+      url3:tr(c[18])||''
     });
   }
   return result;
@@ -433,6 +450,10 @@ function setField(f,idx){
   for(var i=0;i<4;i++){var el=document.getElementById('t'+i);if(el)el.classList.toggle('on',i===idx);}
   doSearch();
 }
+function permitBtn(url, label, cls){
+  if(!url) return '';
+  return '<a href="'+drivePreview(url)+'" target="_blank" class="permit-btn '+cls+'">📄 '+esc(label)+'</a>';
+}
 function doSearch(){
   var q=document.getElementById('qInput').value.trim();
   var stEl=document.getElementById('stEl'),resEl=document.getElementById('resEl');
@@ -472,10 +493,14 @@ function doSearch(){
     if(ps==='danger')b+='<span class="badge br">⚠ الإشارة منتهية</span>';
     else if(ps==='warn')b+='<span class="badge ba">⏰ الإشارة قريبة الانتهاء</span>';
     if(b)html+='<div class="badge-row">'+b+'</div>';
+
+    /* ── الأزرار التلاتة للإشارات ── */
     var permits='';
-    if(x.url1) permits+='<a href="'+drivePreview(x.url1)+'" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#0f2744;border:1px solid #1e3a5f;color:#60a5fa;padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;text-decoration:none">📄 إشارة كلينكر</a> ';
-    if(x.url2) permits+='<a href="'+drivePreview(x.url2)+'" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#061a0d;border:1px solid #14532d;color:#4ade80;padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;text-decoration:none">📄 إشارة فحم</a>';
+    permits += permitBtn(x.url1, HEADERS.url1, 'permit-1');
+    permits += permitBtn(x.url2, HEADERS.url2, 'permit-2');
+    permits += permitBtn(x.url3, HEADERS.url3, 'permit-3');
     if(permits) html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid #1a2535">'+permits+'</div>';
+
     html+='</div>';
   }
   if(hits.length>50)html+='<div class="empty" style="padding:14px">يعرض أول 50 من '+hits.length+'</div>';
@@ -495,6 +520,41 @@ function showToast(msg){
 document.getElementById('qInput').addEventListener('input',doSearch);
 setInterval(loadData,30*60*1000);
 loadData();
+
+// ── إشعارات الأدمن (صوت + اهتزاز + بانر) ─────
+function playNotifSound(){
+  try {
+    var Ctx = window.AudioContext || window.webkitAudioContext;
+    if(!Ctx) return;
+    var ctx = new Ctx();
+    var notes = [523.25, 659.25, 783.99, 1046.5];
+    notes.forEach(function(freq, i){
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      osc.type = 'sine';
+      var start = ctx.currentTime + i * 0.13;
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(0.35, start + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.45);
+      osc.start(start);
+      osc.stop(start + 0.5);
+    });
+  } catch(e){}
+}
+window.closeNotif = function(){
+  document.getElementById('notifOverlay').classList.remove('show');
+};
+function showAdminNotif(msg, timestamp){
+  document.getElementById('notifMsgEl').textContent = msg;
+  var t = new Date(timestamp);
+  document.getElementById('notifTimeEl').textContent = t.toLocaleString('ar-EG');
+  document.getElementById('notifOverlay').classList.add('show');
+  playNotifSound();
+  if(navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 500]);
+}
 </script>
 <!-- Firebase SDK -->
 <script type="module">
@@ -532,7 +592,6 @@ function startHeartbeat(docId, sessionId){
       var snap = await getDoc(doc(db, 'contractors', docId));
       if(!snap.exists()) return;
       var current = snap.data().active_session;
-      console.log('[session-lock] فحص: current=', current, 'my=', sessionId);
       if(current && current !== sessionId){
         clearInterval(heartbeatTimer);
         heartbeatTimer = null;
@@ -552,6 +611,28 @@ function startHeartbeat(docId, sessionId){
 
 function stopHeartbeat(){
   if(heartbeatTimer){ clearInterval(heartbeatTimer); heartbeatTimer = null; }
+}
+
+// ── مستمع إشعارات الأدمن ──────────────
+var notifUnsubscribe = null;
+function startNotifListener(){
+  if(notifUnsubscribe) notifUnsubscribe();
+  notifUnsubscribe = onSnapshot(doc(db, 'notifications', 'latest'), function(snap){
+    if(!snap.exists()) return;
+    var data = snap.data();
+    if(!data.createdAt || !data.message) return;
+    var lastSeen = parseInt(localStorage.getItem('notif-last-seen') || '0');
+    if(data.createdAt <= lastSeen) return;
+    // أول مرة يفتح — سجل الحالى بدون تنبيه
+    if(lastSeen === 0){
+      localStorage.setItem('notif-last-seen', String(data.createdAt));
+      return;
+    }
+    showAdminNotif(data.message, data.createdAt);
+    localStorage.setItem('notif-last-seen', String(data.createdAt));
+  }, function(err){
+    console.warn('[notif-listener] error:', err.code);
+  });
 }
 
 // ── تسجيل الدخول ──────────────
@@ -589,7 +670,7 @@ window.doLogin = async function() {
     var userName = match.data().name || email;
 
     // ── منع الدخول لو فيه جلسة نشطة بالفعل ──
-    var IDLE_THRESHOLD = 30000; // 30 ثانية = يعتبر مهجور
+    var IDLE_THRESHOLD = 30000;
     var currentSession = match.data().active_session;
     var lastSeen = match.data().last_seen || 0;
     var age = Date.now() - lastSeen;
@@ -604,16 +685,13 @@ window.doLogin = async function() {
       return;
     }
 
-    // ── تسجيل الجلسة الجديدة ──
     var sessionId = newSessionId();
     try {
       await updateDoc(doc(db, 'contractors', match.id), {
         active_session: sessionId,
         last_seen: Date.now()
       });
-      console.log('[session-lock] ✅ دخول ناجح، session:', sessionId);
     } catch(e){
-      console.error('[session-lock] ❌ فشل حفظ الـ session ID:', e.code, e.message);
       errEl.textContent = '❌ خطأ فى تسجيل الجلسة: ' + e.code;
       errEl.style.display = 'block';
       btn.disabled = false;
@@ -641,6 +719,7 @@ window.doLogout = async function(){
   var docId = sessionStorage.getItem('auth-docid');
   var sid   = sessionStorage.getItem('auth-sid');
   stopHeartbeat();
+  if(notifUnsubscribe) notifUnsubscribe();
   if(docId && sid){
     try {
       var s = await getDoc(doc(db, 'contractors', docId));
@@ -652,62 +731,6 @@ window.doLogout = async function(){
   sessionStorage.clear();
   location.reload();
 };
-// ── إشعارات الأدمن (صوت + اهتزاز + بانر) ───────
-function playNotifSound(){
-  try {
-    var Ctx = window.AudioContext || window.webkitAudioContext;
-    if(!Ctx) return;
-    var ctx = new Ctx();
-    var notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
-    notes.forEach(function(freq, i){
-      var osc = ctx.createOscillator();
-      var gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.value = freq;
-      osc.type = 'sine';
-      var start = ctx.currentTime + i * 0.13;
-      gain.gain.setValueAtTime(0, start);
-      gain.gain.linearRampToValueAtTime(0.35, start + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.45);
-      osc.start(start);
-      osc.stop(start + 0.5);
-    });
-  } catch(e){}
-}
-
-window.closeNotif = function(){
-  document.getElementById('notifOverlay').classList.remove('show');
-};
-
-function showAdminNotif(msg, timestamp){
-  document.getElementById('notifMsg').textContent = msg;
-  var t = new Date(timestamp);
-  document.getElementById('notifTime').textContent = t.toLocaleString('ar-EG');
-  document.getElementById('notifOverlay').classList.add('show');
-  playNotifSound();
-  if(navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 500]);
-}
-
-function startNotifListener(){
-  onSnapshot(doc(db, 'notifications', 'latest'), function(snap){
-    if(!snap.exists()) return;
-    var data = snap.data();
-    if(!data.createdAt || !data.message) return;
-    var lastSeen = parseInt(localStorage.getItem('notif-last-seen') || '0');
-    if(data.createdAt <= lastSeen) return; // اتشاف قبل كده
-    // أول مرة التطبيق يفتح — سجل الحالى بدون تنبيه
-    if(lastSeen === 0){
-      localStorage.setItem('notif-last-seen', String(data.createdAt));
-      return;
-    }
-    showAdminNotif(data.message, data.createdAt);
-    localStorage.setItem('notif-last-seen', String(data.createdAt));
-  }, function(err){
-    console.warn('[notif-listener] error:', err.code);
-  });
-}
-
 // ── لو دخل قبل كده في نفس الجلسة ─────────────
 var savedEmail = sessionStorage.getItem('auth-email');
 var savedName  = sessionStorage.getItem('auth-name');
@@ -715,19 +738,15 @@ var savedDocId = sessionStorage.getItem('auth-docid');
 var savedSid   = sessionStorage.getItem('auth-sid');
 if(savedEmail){
   if(savedDocId && savedSid){
-    // جلسة عادية مع قفل نشط
     document.getElementById('loginScreen').classList.add('hide');
     showWelcome(savedName || savedEmail);
     startHeartbeat(savedDocId, savedSid);
     startNotifListener();
   } else {
-    // جلسة قديمة من قبل تفعيل القفل — امسحها وخليه يسجل من جديد
     console.warn('[session-lock] جلسة قديمة بدون session ID — إعادة تسجيل مطلوبة');
     sessionStorage.clear();
-    // شاشة الدخول ظاهرة افتراضياً
   }
 }
 </script>
 </body>
 </html>
-
