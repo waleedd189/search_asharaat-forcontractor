@@ -9,7 +9,6 @@
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0a0e1a;--surf:#0f1829;--surf2:#111e2e;--brd:#1e2d4a;--blue:#2563eb;--blue2:#1d4ed8;--green:#10b981;--red:#ef4444;--txt:#e2e8f0;--muted:#475569}
 body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
-
 /* LOGIN */
 #loginScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}
 #loginScreen.hide{display:none}
@@ -20,10 +19,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-he
 .linp{width:100%;background:rgba(255,255,255,0.05);border:1.5px solid var(--brd);border-radius:12px;padding:13px 16px;color:var(--txt);font-family:'Cairo',sans-serif;font-size:15px;outline:none;text-align:center;letter-spacing:3px;margin-bottom:12px;transition:border-color .2s}
 .linp:focus{border-color:var(--blue)}
 .lbtn{width:100%;background:linear-gradient(135deg,var(--blue),var(--blue2));border:none;border-radius:12px;padding:14px;color:#fff;font-family:'Cairo',sans-serif;font-size:15px;font-weight:700;cursor:pointer}
-.lback{display:inline-block;margin-top:16px;color:var(--muted);font-size:13px;text-decoration:none}
-.lback:hover{color:#93c5fd}
 .lerr{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:10px;color:#fca5a5;font-size:13px;margin-top:10px;display:none}
-
 /* APP */
 #adminApp{display:none;min-height:100vh}
 .topbar{background:rgba(10,14,26,0.97);border-bottom:1px solid var(--brd);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;backdrop-filter:blur(12px)}
@@ -31,29 +27,34 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-he
 .brand-ico{width:38px;height:38px;background:linear-gradient(135deg,var(--blue),var(--blue2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
 .brand-name{font-size:15px;font-weight:900;color:#fff}
 .brand-sub{font-size:11px;color:#3b82f6}
-.top-actions{display:flex;align-items:center;gap:8px}
-.btn-home{background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);color:#93c5fd;border-radius:8px;padding:7px 14px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
 .btn-logout{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);color:#fca5a5;border-radius:8px;padding:7px 14px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
-
 .main{padding:20px;max-width:640px;margin:0 auto}
-
 /* STATS */
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
 .stat{background:var(--surf);border:1px solid var(--brd);border-radius:16px;padding:16px;text-align:center}
 .stat-val{font-size:32px;font-weight:900;color:#3b82f6}
 .stat-lbl{font-size:12px;color:var(--muted);margin-top:4px}
-
 /* SECTION */
 .sec{background:var(--surf);border:1px solid var(--brd);border-radius:20px;padding:20px;margin-bottom:16px}
 .sec-title{font-size:15px;font-weight:900;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-
 /* ADD */
 .add-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
 .inp{flex:1;min-width:140px;background:rgba(255,255,255,0.05);border:1.5px solid var(--brd);border-radius:10px;padding:10px 14px;color:var(--txt);font-family:'Cairo',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
 .inp:focus{border-color:var(--blue)}
 .btn-add{background:linear-gradient(135deg,var(--green),#059669);border:none;border-radius:10px;padding:10px 18px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px}
 .btn-add:disabled{opacity:0.6;cursor:not-allowed}
-
+/* NOTIFICATION SEND */
+.sec-notif{background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(217,119,6,0.05));border:1px solid rgba(245,158,11,0.3)}
+.sec-notif .sec-title{color:#fbbf24}
+.notif-textarea{width:100%;min-height:80px;background:rgba(0,0,0,0.25);border:1.5px solid var(--brd);border-radius:12px;padding:12px 14px;color:var(--txt);font-family:'Cairo',sans-serif;font-size:14px;line-height:1.6;outline:none;resize:vertical;text-align:right;transition:border-color .2s}
+.notif-textarea:focus{border-color:#f59e0b}
+.notif-templates{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.notif-tmpl{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);color:#fbbf24;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;transition:.15s;font-family:'Cairo',sans-serif}
+.notif-tmpl:hover{background:rgba(245,158,11,0.2)}
+.btn-send-notif{background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:12px;padding:12px 24px;color:#fff;font-family:'Cairo',sans-serif;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(245,158,11,0.3)}
+.btn-send-notif:active{transform:scale(0.98)}
+.btn-send-notif:disabled{opacity:0.6;cursor:not-allowed}
+.last-sent{font-size:11px;color:var(--muted);margin-top:10px;text-align:center}
 /* LIST */
 .user-item{background:rgba(255,255,255,0.03);border:1px solid var(--brd);border-radius:14px;padding:13px 16px;margin-bottom:8px;transition:.15s}
 .user-item:hover{background:rgba(255,255,255,0.05)}
@@ -73,30 +74,17 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-he
 .perm-dot{width:9px;height:9px;border-radius:50%;background:#1e2d4a;transition:.15s;flex-shrink:0}
 .perm-lbl{font-size:12px;font-weight:700;color:#94a3b8}
 .perm-toggle.active .perm-lbl{color:#93c5fd}
-
-/* ONLINE NOW */
-.online-item{background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.online-dot{width:9px;height:9px;border-radius:50%;background:#10b981;flex-shrink:0;box-shadow:0 0 8px #10b981;animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-.online-info{flex:1;display:flex;flex-direction:column;gap:2px}
-.online-name{font-size:14px;font-weight:700;color:#fff}
-.online-meta{font-size:11px;color:#64748b}
-.btn-kick{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);color:#fca5a5;border-radius:8px;padding:6px 12px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
-.btn-kick:hover{background:rgba(239,68,68,0.2)}
-
 /* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);border-radius:12px;padding:11px 22px;font-size:13px;font-weight:700;z-index:999;transition:transform .3s ease;white-space:nowrap;pointer-events:none;font-family:'Cairo',sans-serif}
 .toast.show{transform:translateX(-50%) translateY(0)}
 .toast.ok{background:#052e16;border:1px solid #16a34a;color:#4ade80}
 .toast.err{background:#200a0a;border:1px solid #7f1d1d;color:#fca5a5}
-
 .spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 .loading{text-align:center;padding:30px;color:var(--muted)}
 </style>
 </head>
 <body>
-
 <!-- LOGIN -->
 <div id="loginScreen">
   <div class="lbox">
@@ -107,10 +95,9 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-he
       onkeydown="if(event.key==='Enter')checkPw()">
     <button class="lbtn" onclick="checkPw()">دخول ←</button>
     <div class="lerr" id="pwErr">❌ كلمة المرور غلط</div>
-    <a class="lback" href="index.html">← رجوع للرئيسية</a>
+    <a href="index.html" style="display:inline-block;margin-top:16px;color:var(--muted);font-size:13px;text-decoration:none">← رجوع للرئيسية</a>
   </div>
 </div>
-
 <!-- ADMIN APP -->
 <div id="adminApp">
   <div class="topbar">
@@ -121,14 +108,12 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-he
         <div class="brand-sub">إدارة الاشارات</div>
       </div>
     </div>
-    <div class="top-actions">
-      <button class="btn-home" onclick="location.href='index.html'">← الرئيسية</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn-logout" style="background:rgba(59,130,246,0.12);border-color:rgba(59,130,246,0.25);color:#93c5fd" onclick="location.href='index.html'">← الرئيسية</button>
       <button class="btn-logout" onclick="doLogout()">خروج</button>
     </div>
   </div>
-
   <div class="main">
-
     <!-- STATS -->
     <div class="stats">
       <div class="stat">
@@ -141,10 +126,20 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-he
       </div>
     </div>
 
-    <!-- ONLINE NOW -->
-    <div class="sec">
-      <div class="sec-title">🟢 متصلين دلوقتي <span id="onlineCount" style="color:#10b981;font-size:13px"></span></div>
-      <div id="onlineList"><div class="loading"><div class="spin"></div></div></div>
+    <!-- 🔔 SEND NOTIFICATION -->
+    <div class="sec sec-notif">
+      <div class="sec-title">🔔 إرسال تنبيه للمستخدمين</div>
+      <textarea class="notif-textarea" id="notifMsg" placeholder="مثال: تم رفع إشارات جديدة النهاردة، تقدروا تحمّلوها من التطبيق"></textarea>
+      <div class="notif-templates">
+        <button class="notif-tmpl" onclick="setTmpl('t1')">🎉 إشارات جديدة</button>
+        <button class="notif-tmpl" onclick="setTmpl('t2')">📥 تحديث</button>
+        <button class="notif-tmpl" onclick="setTmpl('t3')">⚠️ تنبيه</button>
+        <button class="notif-tmpl" onclick="setTmpl('t4')">🚨 عاجل</button>
+      </div>
+      <button class="btn-send-notif" id="sendBtn" onclick="sendNotif()">
+        🔔 إرسال التنبيه الآن (صوت + اهتزاز)
+      </button>
+      <div class="last-sent" id="lastSent"></div>
     </div>
 
     <!-- ADD USER -->
@@ -169,25 +164,19 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-he
         ✅ إضافة
       </button>
     </div>
-
     <!-- USERS LIST -->
     <div class="sec">
       <div class="sec-title">👥 المقاولين المصرح ليهم</div>
       <div id="usersList"><div class="loading"><div class="spin"></div></div></div>
     </div>
-
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script type="module">
 import { initializeApp }              from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, serverTimestamp, updateDoc, onSnapshot, setDoc, query, orderBy }
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, serverTimestamp, updateDoc, setDoc, getDoc }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
 const ADMIN_PASS = 'admin2026';
-
 const firebaseConfig = {
   apiKey: "AIzaSyCmLfaEb7lPCWaqiQLNRsqWUjuTya4xWF0",
   authDomain: "asharaat-search.firebaseapp.com",
@@ -196,10 +185,8 @@ const firebaseConfig = {
   messagingSenderId: "930583092172",
   appId: "1:930583092172:web:89aaf88198c3b1d1195b69"
 };
-
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
-
 // ── LOGIN ──────────────────────────────────────────
 window.checkPw = function(){
   var pw = document.getElementById('pw').value;
@@ -207,74 +194,76 @@ window.checkPw = function(){
     document.getElementById('loginScreen').classList.add('hide');
     document.getElementById('adminApp').style.display = 'block';
     loadUsers();
-    loadOnlineUsers();
+    loadLastNotif();
   } else {
     document.getElementById('pwErr').style.display = 'block';
   }
 };
-
 window.doLogout = function(){
   document.getElementById('loginScreen').classList.remove('hide');
   document.getElementById('adminApp').style.display = 'none';
   document.getElementById('pw').value = '';
 };
 
-// ── ONLINE USERS ───────────────────────────────────
-function loadOnlineUsers(){
-  var ref = collection(db, 'sessions');
-  onSnapshot(ref, function(snap){
-    var sessions = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
-    var el = document.getElementById('onlineList');
-    var countEl = document.getElementById('onlineCount');
-    if(!sessions.length){
-      el.innerHTML = '<div class="empty-list">مفيش حد متصل دلوقتي</div>';
-      if(countEl) countEl.textContent = '';
-      return;
-    }
-    if(countEl) countEl.textContent = '('+sessions.length+')';
-    el.innerHTML = sessions.map(function(s){
-      var time = s.loginAt ? new Date(s.loginAt.toDate()).toLocaleTimeString('ar-EG') : '—';
-      var page = s.page === 'supervisor' ? '👁 المشرف' : '🚛 المقاول';
-      return '<div class="online-item">'
-        + '<div class="online-dot"></div>'
-        + '<div class="online-info">'
-        + '<div class="online-name">'+(s.name||s.email||'—')+'</div>'
-        + '<div class="online-meta">'+page+' — دخل: '+time+'</div>'
-        + '</div>'
-        + '<button class="btn-kick" data-sid="'+s.id+'">طرد</button>'
-        + '</div>';
-    }).join('');
-    el.querySelectorAll('.btn-kick').forEach(function(btn){
-      btn.addEventListener('click', function(){ kickUser(this.dataset.sid); });
-    });
-  });
-}
-
-window.kickUser = async function(sessionId){
-  if(!confirm('هتطرد المستخدم ده؟')) return;
-  try {
-    await deleteDoc(doc(db,'sessions',sessionId));
-    toast('✅ تم طرد المستخدم','ok');
-  } catch(e){
-    toast('❌ خطأ: '+e.message,'err');
-  }
+// ── 🔔 SEND NOTIFICATION ──────────────────────
+var TEMPLATES = {
+  t1: '🎉 تم رفع إشارات جديدة النهاردة!\n📥 افتح التطبيق وحمّل الإشارة بتاعتك\n🚛 وباقى الإشارات جارى رفعها',
+  t2: '📥 تم تحديث التطبيق بمميزات جديدة\n✨ افتح واستمتع بالتحديث',
+  t3: '⚠️ تنبيه هام\nبرجاء الاطلاع على آخر التحديثات فى الاشارات',
+  t4: '🚨 تنبيه عاجل\nيرجى فحص الاشارات والتواصل مع الإدارة'
 };
+
+window.setTmpl = function(key){
+  document.getElementById('notifMsg').value = TEMPLATES[key] || '';
+};
+
+window.sendNotif = async function(){
+  var msg = document.getElementById('notifMsg').value.trim();
+  var btn = document.getElementById('sendBtn');
+  if(!msg){ toast('⚠️ اكتب رسالة الأول','err'); return; }
+  if(!confirm('هتبعت التنبيه ده لكل المستخدمين المتصلين؟\n\nالمحتوى:\n\n' + msg)) return;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> جاري الإرسال...';
+  try {
+    await setDoc(doc(db, 'notifications', 'latest'), {
+      message: msg,
+      createdAt: Date.now(),
+      sentBy: 'admin'
+    });
+    toast('✅ اترسل التنبيه لكل المستخدمين','ok');
+    document.getElementById('lastSent').textContent = '✓ آخر إرسال: ' + new Date().toLocaleString('ar-EG');
+    document.getElementById('notifMsg').value = '';
+  } catch(e){
+    toast('❌ خطأ: ' + (e.code || e.message),'err');
+    console.error(e);
+  }
+  btn.disabled = false;
+  btn.innerHTML = '🔔 إرسال التنبيه الآن (صوت + اهتزاز)';
+};
+
+async function loadLastNotif(){
+  try {
+    var snap = await getDoc(doc(db, 'notifications', 'latest'));
+    if(snap.exists() && snap.data().createdAt){
+      var t = new Date(snap.data().createdAt);
+      document.getElementById('lastSent').textContent = '✓ آخر إرسال: ' + t.toLocaleString('ar-EG');
+    }
+  } catch(e){}
+}
 
 // ── LOAD USERS ─────────────────────────────────────
 var allUsers = [];
-
 async function loadUsers(){
   document.getElementById('usersList').innerHTML = '<div class="loading"><div class="spin"></div></div>';
   try {
     var snap = await getDocs(collection(db,'contractors'));
-    allUsers = snap.docs.map(function(d){ return {id:d.id, ...d.data()}; });
+    allUsers = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
     renderUsers();
     updateStats();
   } catch(e){
     document.getElementById('usersList').innerHTML = '<div class="empty-list">❌ خطأ: '+e.message+'</div>';
   }
 }
-
 function renderUsers(){
   var el = document.getElementById('usersList');
   if(!allUsers.length){
@@ -309,7 +298,6 @@ function renderUsers(){
     });
   });
 }
-
 function updateStats(){
   document.getElementById('statCount').textContent = allUsers.length;
   var today = new Date().toDateString();
@@ -320,20 +308,16 @@ function updateStats(){
   }).length;
   document.getElementById('statNew').textContent = todayCount;
 }
-
 // ── ADD USER ───────────────────────────────────────
 window.addUser = async function(){
   var name  = document.getElementById('newName').value.trim();
   var email = document.getElementById('newEmail').value.trim().toLowerCase();
   var btn   = document.getElementById('addBtn');
-
   if(!name){ toast('⚠️ أدخل الاسم','err'); return; }
   if(!email || !email.includes('@')){ toast('⚠️ أدخل إيميل صحيح','err'); return; }
   if(allUsers.find(function(u){ return u.email===email; })){ toast('⚠️ الإيميل موجود بالفعل','err'); return; }
-
   btn.disabled = true;
   btn.innerHTML = '<span class="spin"></span> جاري الإضافة...';
-
   try {
     var newPerms = {
       perm_page1: document.getElementById('np1').classList.contains('active'),
@@ -356,7 +340,6 @@ window.addUser = async function(){
   btn.disabled = false;
   btn.innerHTML = '✅ إضافة';
 };
-
 // ── DELETE USER ────────────────────────────────────
 window.delUser = async function(id, name){
   if(!confirm('هتحذف '+name+'؟')) return;
@@ -368,7 +351,6 @@ window.delUser = async function(id, name){
     toast('❌ خطأ: '+e.message,'err');
   }
 };
-
 // ── TOGGLE PERMISSION ──────────────────────────
 window.togglePerm = async function(id, field, current){
   var newVal = !current;
@@ -376,7 +358,6 @@ window.togglePerm = async function(id, field, current){
     var update = {};
     update[field] = newVal;
     await updateDoc(doc(db,'contractors',id), update);
-    // update local
     var u = allUsers.find(function(x){ return x.id===id; });
     if(u) u[field] = newVal;
     renderUsers();
@@ -385,13 +366,10 @@ window.togglePerm = async function(id, field, current){
     toast('❌ خطأ: '+e.message,'err');
   }
 };
-
-// ── TOGGLE NEW PERM ─────────────────────────────
 window.toggleNewPerm = function(key){
   var el = document.getElementById('n'+key);
   if(el) el.classList.toggle('active');
 };
-
 // ── TOAST ──────────────────────────────────────────
 var tt;
 function toast(msg, type){
