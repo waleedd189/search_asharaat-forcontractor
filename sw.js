@@ -1,5 +1,5 @@
 // Service Worker — Network First Strategy
-const CACHE_VERSION = 'asharaat-v2';
+const CACHE_VERSION = 'asharaat-v3';
 const RUNTIME_CACHE = CACHE_VERSION + '-runtime';
 
 self.addEventListener('install', event => {

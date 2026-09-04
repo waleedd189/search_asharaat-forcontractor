@@ -20,6 +20,8 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-he
 .linp{width:100%;background:rgba(255,255,255,0.05);border:1.5px solid var(--brd);border-radius:12px;padding:13px 16px;color:var(--txt);font-family:'Cairo',sans-serif;font-size:15px;outline:none;text-align:center;letter-spacing:3px;margin-bottom:12px;transition:border-color .2s}
 .linp:focus{border-color:var(--blue)}
 .lbtn{width:100%;background:linear-gradient(135deg,var(--blue),var(--blue2));border:none;border-radius:12px;padding:14px;color:#fff;font-family:'Cairo',sans-serif;font-size:15px;font-weight:700;cursor:pointer}
+.lback{display:inline-block;margin-top:16px;color:var(--muted);font-size:13px;text-decoration:none}
+.lback:hover{color:#93c5fd}
 .lerr{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:10px;color:#fca5a5;font-size:13px;margin-top:10px;display:none}
 
 /* APP */
@@ -29,6 +31,8 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-he
 .brand-ico{width:38px;height:38px;background:linear-gradient(135deg,var(--blue),var(--blue2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
 .brand-name{font-size:15px;font-weight:900;color:#fff}
 .brand-sub{font-size:11px;color:#3b82f6}
+.top-actions{display:flex;align-items:center;gap:8px}
+.btn-home{background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);color:#93c5fd;border-radius:8px;padding:7px 14px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
 .btn-logout{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);color:#fca5a5;border-radius:8px;padding:7px 14px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
 
 .main{padding:20px;max-width:640px;margin:0 auto}
@@ -51,14 +55,34 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-he
 .btn-add:disabled{opacity:0.6;cursor:not-allowed}
 
 /* LIST */
-.user-item{background:rgba(255,255,255,0.03);border:1px solid var(--brd);border-radius:12px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;transition:.15s}
+.user-item{background:rgba(255,255,255,0.03);border:1px solid var(--brd);border-radius:14px;padding:13px 16px;margin-bottom:8px;transition:.15s}
 .user-item:hover{background:rgba(255,255,255,0.05)}
+.user-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .user-info{display:flex;flex-direction:column;gap:3px}
 .user-name{font-size:14px;font-weight:700;color:#fff}
 .user-email{font-size:12px;color:#3b82f6;direction:ltr;text-align:right}
 .btn-del{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);color:#fca5a5;border-radius:8px;padding:6px 14px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:.15s;white-space:nowrap}
 .btn-del:hover{background:rgba(239,68,68,0.2)}
 .empty-list{text-align:center;padding:30px;color:var(--muted);font-size:13px}
+/* PERMISSIONS */
+.perm-row{display:flex;gap:8px;flex-wrap:wrap}
+.perm-toggle{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.04);border:1px solid var(--brd);border-radius:10px;padding:6px 12px;cursor:pointer;transition:.15s;user-select:none}
+.perm-toggle:hover{background:rgba(255,255,255,0.07)}
+.perm-toggle.active{background:rgba(37,99,235,0.15);border-color:#2563eb}
+.perm-toggle.active .perm-dot{background:#3b82f6}
+.perm-dot{width:9px;height:9px;border-radius:50%;background:#1e2d4a;transition:.15s;flex-shrink:0}
+.perm-lbl{font-size:12px;font-weight:700;color:#94a3b8}
+.perm-toggle.active .perm-lbl{color:#93c5fd}
+
+/* ONLINE NOW */
+.online-item{background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.online-dot{width:9px;height:9px;border-radius:50%;background:#10b981;flex-shrink:0;box-shadow:0 0 8px #10b981;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.online-info{flex:1;display:flex;flex-direction:column;gap:2px}
+.online-name{font-size:14px;font-weight:700;color:#fff}
+.online-meta{font-size:11px;color:#64748b}
+.btn-kick{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);color:#fca5a5;border-radius:8px;padding:6px 12px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn-kick:hover{background:rgba(239,68,68,0.2)}
 
 /* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);border-radius:12px;padding:11px 22px;font-size:13px;font-weight:700;z-index:999;transition:transform .3s ease;white-space:nowrap;pointer-events:none;font-family:'Cairo',sans-serif}
@@ -83,6 +107,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-he
       onkeydown="if(event.key==='Enter')checkPw()">
     <button class="lbtn" onclick="checkPw()">دخول ←</button>
     <div class="lerr" id="pwErr">❌ كلمة المرور غلط</div>
+    <a class="lback" href="index.html">← رجوع للرئيسية</a>
   </div>
 </div>
 
@@ -96,7 +121,10 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-he
         <div class="brand-sub">إدارة الاشارات</div>
       </div>
     </div>
-    <button class="btn-logout" onclick="doLogout()">خروج</button>
+    <div class="top-actions">
+      <button class="btn-home" onclick="location.href='index.html'">← الرئيسية</button>
+      <button class="btn-logout" onclick="doLogout()">خروج</button>
+    </div>
   </div>
 
   <div class="main">
@@ -113,6 +141,12 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-he
       </div>
     </div>
 
+    <!-- ONLINE NOW -->
+    <div class="sec">
+      <div class="sec-title">🟢 متصلين دلوقتي <span id="onlineCount" style="color:#10b981;font-size:13px"></span></div>
+      <div id="onlineList"><div class="loading"><div class="spin"></div></div></div>
+    </div>
+
     <!-- ADD USER -->
     <div class="sec">
       <div class="sec-title">➕ إضافة مقاول جديد</div>
@@ -120,6 +154,16 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-he
         <input type="text" class="inp" id="newName" placeholder="الاسم">
         <input type="email" class="inp" id="newEmail" placeholder="example@gmail.com"
           onkeydown="if(event.key==='Enter')addUser()">
+      </div>
+      <div class="perm-row" style="margin-bottom:12px">
+        <div class="perm-toggle active" id="np1" onclick="toggleNewPerm('p1')">
+          <div class="perm-dot"></div>
+          <span class="perm-lbl">🚛 صفحة المقاول</span>
+        </div>
+        <div class="perm-toggle" id="np2" onclick="toggleNewPerm('p2')">
+          <div class="perm-dot"></div>
+          <span class="perm-lbl">👁 صفحة المشرف</span>
+        </div>
       </div>
       <button class="btn-add" id="addBtn" onclick="addUser()">
         ✅ إضافة
@@ -139,7 +183,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);min-he
 
 <script type="module">
 import { initializeApp }              from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, serverTimestamp }
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, serverTimestamp, updateDoc, onSnapshot, setDoc, query, orderBy }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const ADMIN_PASS = 'admin2026';
@@ -163,6 +207,7 @@ window.checkPw = function(){
     document.getElementById('loginScreen').classList.add('hide');
     document.getElementById('adminApp').style.display = 'block';
     loadUsers();
+    loadOnlineUsers();
   } else {
     document.getElementById('pwErr').style.display = 'block';
   }
@@ -172,6 +217,47 @@ window.doLogout = function(){
   document.getElementById('loginScreen').classList.remove('hide');
   document.getElementById('adminApp').style.display = 'none';
   document.getElementById('pw').value = '';
+};
+
+// ── ONLINE USERS ───────────────────────────────────
+function loadOnlineUsers(){
+  var ref = collection(db, 'sessions');
+  onSnapshot(ref, function(snap){
+    var sessions = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+    var el = document.getElementById('onlineList');
+    var countEl = document.getElementById('onlineCount');
+    if(!sessions.length){
+      el.innerHTML = '<div class="empty-list">مفيش حد متصل دلوقتي</div>';
+      if(countEl) countEl.textContent = '';
+      return;
+    }
+    if(countEl) countEl.textContent = '('+sessions.length+')';
+    el.innerHTML = sessions.map(function(s){
+      var time = s.loginAt ? new Date(s.loginAt.toDate()).toLocaleTimeString('ar-EG') : '—';
+      var page = s.page === 'supervisor' ? '👁 المشرف' : '🚛 المقاول';
+      return '<div class="online-item">'
+        + '<div class="online-dot"></div>'
+        + '<div class="online-info">'
+        + '<div class="online-name">'+(s.name||s.email||'—')+'</div>'
+        + '<div class="online-meta">'+page+' — دخل: '+time+'</div>'
+        + '</div>'
+        + '<button class="btn-kick" data-sid="'+s.id+'">طرد</button>'
+        + '</div>';
+    }).join('');
+    el.querySelectorAll('.btn-kick').forEach(function(btn){
+      btn.addEventListener('click', function(){ kickUser(this.dataset.sid); });
+    });
+  });
+}
+
+window.kickUser = async function(sessionId){
+  if(!confirm('هتطرد المستخدم ده؟')) return;
+  try {
+    await deleteDoc(doc(db,'sessions',sessionId));
+    toast('✅ تم طرد المستخدم','ok');
+  } catch(e){
+    toast('❌ خطأ: '+e.message,'err');
+  }
 };
 
 // ── LOAD USERS ─────────────────────────────────────
@@ -196,14 +282,32 @@ function renderUsers(){
     return;
   }
   el.innerHTML = allUsers.map(function(u){
+    var p1 = u.perm_page1 !== false;
+    var p2 = u.perm_page2 === true;
     return '<div class="user-item">'
+      + '<div class="user-top">'
       + '<div class="user-info">'
       + '<div class="user-name">'+(u.name||'—')+'</div>'
       + '<div class="user-email">'+(u.email||'—')+'</div>'
       + '</div>'
-      + '<button class="btn-del" onclick="delUser(\''+u.id+'\',\''+u.name+'\')">🗑 حذف</button>'
+      + '<button class="btn-del" data-uid="'+u.id+'" data-name="'+(u.name||'')+'">🗑 حذف</button>'
+      + '</div>'
+      + '<div class="perm-row">'
+      + '<div class="perm-toggle'+(p1?' active':'')+'" data-uid="'+u.id+'" data-field="perm_page1" data-val="'+p1+'">'
+      + '<div class="perm-dot"></div><span class="perm-lbl">🚛 صفحة المقاول</span></div>'
+      + '<div class="perm-toggle'+(p2?' active':'')+'" data-uid="'+u.id+'" data-field="perm_page2" data-val="'+p2+'">'
+      + '<div class="perm-dot"></div><span class="perm-lbl">👁 صفحة المشرف</span></div>'
+      + '</div>'
       + '</div>';
   }).join('');
+  el.querySelectorAll('.btn-del').forEach(function(btn){
+    btn.addEventListener('click', function(){ delUser(this.dataset.uid, this.dataset.name); });
+  });
+  el.querySelectorAll('.perm-toggle').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      togglePerm(this.dataset.uid, this.dataset.field, this.dataset.val === 'true');
+    });
+  });
 }
 
 function updateStats(){
@@ -231,9 +335,15 @@ window.addUser = async function(){
   btn.innerHTML = '<span class="spin"></span> جاري الإضافة...';
 
   try {
+    var newPerms = {
+      perm_page1: document.getElementById('np1').classList.contains('active'),
+      perm_page2: document.getElementById('np2').classList.contains('active')
+    };
     await addDoc(collection(db,'contractors'),{
       name: name,
       email: email,
+      perm_page1: newPerms.perm_page1,
+      perm_page2: newPerms.perm_page2,
       createdAt: serverTimestamp()
     });
     document.getElementById('newName').value  = '';
@@ -257,6 +367,29 @@ window.delUser = async function(id, name){
   } catch(e){
     toast('❌ خطأ: '+e.message,'err');
   }
+};
+
+// ── TOGGLE PERMISSION ──────────────────────────
+window.togglePerm = async function(id, field, current){
+  var newVal = !current;
+  try {
+    var update = {};
+    update[field] = newVal;
+    await updateDoc(doc(db,'contractors',id), update);
+    // update local
+    var u = allUsers.find(function(x){ return x.id===id; });
+    if(u) u[field] = newVal;
+    renderUsers();
+    toast('✅ تم تحديث الصلاحية', 'ok');
+  } catch(e){
+    toast('❌ خطأ: '+e.message,'err');
+  }
+};
+
+// ── TOGGLE NEW PERM ─────────────────────────────
+window.toggleNewPerm = function(key){
+  var el = document.getElementById('n'+key);
+  if(el) el.classList.toggle('active');
 };
 
 // ── TOAST ──────────────────────────────────────────
