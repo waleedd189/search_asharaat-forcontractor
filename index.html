@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
@@ -109,6 +108,25 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
 .login-btn:disabled{opacity:0.6;cursor:not-allowed}
 .login-err{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:11px;color:#fca5a5;font-size:13px;margin-top:12px;display:none}
 .login-spin{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite}
+/* ── ROLE PICKER ── */
+#pickerScreen{position:fixed;inset:0;background:#0a0e1a;z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+#pickerScreen.show{display:flex}
+.picker-box{width:100%;max-width:400px;background:#0f1829;border:1px solid #1e2d4a;border-radius:24px;padding:32px 26px;text-align:center}
+.picker-hello{font-size:15px;color:#93c5fd;font-weight:700;margin-bottom:2px}
+.picker-hello span{color:#4ade80}
+.picker-hint{font-size:12px;color:#475569;margin-bottom:22px}
+.role{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.03);border:1.5px solid #1e2d4a;border-radius:16px;padding:15px 16px;cursor:pointer;transition:.18s;width:100%;margin-bottom:10px;font-family:'Cairo',inherit;text-align:right;color:inherit}
+.role:hover{background:rgba(37,99,235,0.1);border-color:#2563eb}
+.role-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.role-c .role-ico{background:#0f2744;border:1px solid #1e3a5f}
+.role-s .role-ico{background:#052e16;border:1px solid #14532d}
+.role-a .role-ico{background:#2c1500;border:1px solid #451a03}
+.role-txt{flex:1}
+.role-name{font-size:16px;font-weight:800;color:#fff}
+.role-desc{font-size:12px;color:#64748b;margin-top:2px}
+.role-arrow{color:#334155;font-size:20px}
+.picker-logout{margin-top:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#fca5a5;border-radius:12px;padding:11px;width:100%;font-family:'Cairo',inherit;font-size:14px;font-weight:700;cursor:pointer}
+.picker-no{background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:12px;padding:12px;color:#fbbf24;font-size:13px;line-height:1.7;margin-bottom:12px;display:none}
 /* ── WELCOME ── */
 .welcome-msg{font-size:12px;font-weight:600;color:#3b82f6;margin-top:3px;display:none}
 .welcome-msg span{color:#4ade80;font-weight:700}
@@ -118,6 +136,7 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
 /* ── LOGOUT BTN ── */
 .btn-logout-user{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#fca5a5;border-radius:8px;padding:6px 14px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
 .btn-logout-user:hover{background:rgba(239,68,68,0.2)}
+.btn-back-picker{background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);color:#93c5fd;border-radius:8px;padding:6px 14px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;margin-left:6px}
 /* ── TOAST ── */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;border-radius:12px;padding:11px 22px;font-size:14px;font-weight:700;z-index:999;transition:transform 0.3s ease;white-space:nowrap;pointer-events:none;font-family:'Cairo',inherit}
 .toast.show{transform:translateX(-50%) translateY(0)}
@@ -153,6 +172,31 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
       Search Asharaat-forcontractor © 2026 🚛 | Sky Ports<br>
       Developed by <span class="sig-name">Waleed Salah</span>
     </div>
+  </div>
+</div>
+<!-- ROLE PICKER (بعد الدخول) -->
+<div id="pickerScreen">
+  <div class="picker-box">
+    <div class="login-logo">🚦</div>
+    <div class="picker-hello">أهلاً <span id="pickerName"></span> 👋</div>
+    <div class="picker-hint">اختار الصفحة اللي عايز تدخلها</div>
+    <div class="picker-no" id="pickerNo">⚠️ إيميلك مش متصرّحله يدخل أي صفحة حالياً — كلّم الأدمن.</div>
+    <button class="role role-c" id="roleC" onclick="goContractor()" style="display:none">
+      <div class="role-ico">🚛</div>
+      <div class="role-txt"><div class="role-name">صفحة المقاول</div><div class="role-desc">بحث الاشارات وروابط التصاريح</div></div>
+      <div class="role-arrow">←</div>
+    </button>
+    <button class="role role-s" id="roleS" onclick="goSupervisor()" style="display:none">
+      <div class="role-ico">👁</div>
+      <div class="role-txt"><div class="role-name">صفحة المشرف</div><div class="role-desc">متابعة كل المقاولين والاشارات</div></div>
+      <div class="role-arrow">←</div>
+    </button>
+    <button class="role role-a" id="roleA" onclick="goAdmin()">
+      <div class="role-ico">🔐</div>
+      <div class="role-txt"><div class="role-name">لوحة الأدمن</div><div class="role-desc">إدارة الصلاحيات (بكلمة سر)</div></div>
+      <div class="role-arrow">←</div>
+    </button>
+    <button class="picker-logout" onclick="doLogout()">تسجيل الخروج</button>
   </div>
 </div>
 <div class="wrap">
@@ -199,7 +243,10 @@ body{font-family:'Cairo',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;d
     </div>
     <div class="header-actions">
       <div class="rtime-top" id="rtEl"></div>
-      <button class="btn-logout-user" onclick="doLogout()">خروج</button>
+      <div>
+        <button class="btn-back-picker" onclick="backToPicker()">☰ الصفحات</button>
+        <button class="btn-logout-user" onclick="doLogout()">خروج</button>
+      </div>
     </div>
   </div>
   <!-- SEARCH -->
@@ -521,6 +568,11 @@ document.getElementById('qInput').addEventListener('input',doSearch);
 setInterval(loadData,30*60*1000);
 loadData();
 
+// ── الرجوع لشاشة الاختيار من داخل صفحة المقاول ──
+function backToPicker(){
+  document.getElementById('pickerScreen').classList.add('show');
+}
+
 // ── إشعارات الأدمن (صوت + اهتزاز + بانر) ─────
 function playNotifSound(){
   try {
@@ -576,6 +628,21 @@ function showWelcome(name){
   var span = document.getElementById('welcomeName');
   if(msg && span){ span.textContent = name; msg.style.display = 'block'; }
 }
+
+// ── شاشة الاختيار (مقاول / مشرف / أدمن) ─────
+function showPicker(p1, p2, name){
+  document.getElementById('pickerName').textContent = name || '';
+  document.getElementById('roleC').style.display = p1 ? 'flex' : 'none';
+  document.getElementById('roleS').style.display = p2 ? 'flex' : 'none';
+  document.getElementById('pickerNo').style.display = (!p1 && !p2) ? 'block' : 'none';
+  document.getElementById('loginScreen').classList.add('hide');
+  document.getElementById('pickerScreen').classList.add('show');
+}
+window.goContractor = function(){
+  document.getElementById('pickerScreen').classList.remove('show');  // يعرض صفحة المقاول (نفس الصفحة)
+};
+window.goSupervisor = function(){ location.href = 'supervisor.html'; };
+window.goAdmin      = function(){ location.href = 'admin.html'; };
 
 // ── نظام الجلسة الواحدة (Single-Session Lock) ─────
 function newSessionId(){
@@ -660,8 +727,11 @@ window.doLogin = async function() {
       btn.innerHTML = 'دخول ←';
       return;
     }
-    if(match.data().perm_page1 === false){
-      errEl.textContent = '❌ مش مصرح ليك بالدخول لهذه الصفحة';
+    // ── الصلاحيات: المقاول افتراضى / المشرف بتفعيل ──
+    var p1 = match.data().perm_page1 !== false;
+    var p2 = match.data().perm_page2 === true;
+    if(!p1 && !p2){
+      errEl.textContent = '❌ مش مصرح ليك بالدخول لأي صفحة — كلّم الأدمن';
       errEl.style.display = 'block';
       btn.disabled = false;
       btn.innerHTML = 'دخول ←';
@@ -703,8 +773,10 @@ window.doLogin = async function() {
     sessionStorage.setItem('auth-name', userName);
     sessionStorage.setItem('auth-docid', match.id);
     sessionStorage.setItem('auth-sid', sessionId);
-    document.getElementById('loginScreen').classList.add('hide');
+    sessionStorage.setItem('auth-p1', p1 ? '1' : '0');
+    sessionStorage.setItem('auth-p2', p2 ? '1' : '0');
     showWelcome(userName);
+    showPicker(p1, p2, userName);
     startHeartbeat(match.id, sessionId);
     startNotifListener();
   } catch(e) {
@@ -738,8 +810,10 @@ var savedDocId = sessionStorage.getItem('auth-docid');
 var savedSid   = sessionStorage.getItem('auth-sid');
 if(savedEmail){
   if(savedDocId && savedSid){
-    document.getElementById('loginScreen').classList.add('hide');
+    var rp1 = sessionStorage.getItem('auth-p1') !== '0';   // افتراضى مسموح
+    var rp2 = sessionStorage.getItem('auth-p2') === '1';
     showWelcome(savedName || savedEmail);
+    showPicker(rp1, rp2, savedName || savedEmail);
     startHeartbeat(savedDocId, savedSid);
     startNotifListener();
   } else {
